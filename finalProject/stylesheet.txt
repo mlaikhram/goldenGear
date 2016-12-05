@@ -1,0 +1,23 @@
+.sprite {
+    background-image: url(spritesheet.png);
+    background-repeat: no-repeat;
+    display: block;
+}
+
+.sprite-espurr {
+    width: 250px;
+    height: 250px;
+    background-position: -5px -5px;
+}
+
+.sprite-gray {
+    width: 2000px;
+    height: 2000px;
+    background-position: -265px -5px;
+}
+
+.sprite-squirtle {
+    width: 166px;
+    height: 200px;
+    background-position: -2275px -5px;
+}
