@@ -1,0 +1,29 @@
+Bugfixes:
+Fix timestep
+Fix left/right hitboxes
+Fix height hitbox
+
+Sprites/Visual:
+Add silver gear sprite
+Add target sprite
+Add character and enemy animations
+Add HUD with gear count, level, and health
+Add particle effects on active magnets and breaking wooden floors
+
+Audio:
+Add background music
+Add sound effects
+
+Mechanical:
+Add nearest magnet/enemy snapping for targets (based on mouse position)
+Allow terminal velocity to break through wooden floors
+Add magnet attract and repel functionality
+Add crab functionality
+Add star functionality
+
+General:
+Add level select menu
+Add game over screen
+Add more levels
+Add boss fight
+Save current gear count and only spawn in gears that have not been collected
