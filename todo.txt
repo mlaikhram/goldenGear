@@ -1,7 +1,7 @@
 Bugfixes:
 Fix timestep
-Fix left/right hitboxes
-Fix height hitbox
+//Fix left/right hitboxes
+Fix height hitbox -- only when collecting objects (world height hitbox works fine)
 
 Sprites/Visual:
 Add silver gear sprite

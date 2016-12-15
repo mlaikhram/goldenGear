@@ -261,12 +261,40 @@ void worldToTileCoordinates(float worldX, float worldY, int *gridX, int *gridY) 
 
 void collisionx(Entity &entity) {
 	int gridX, gridY;
-	worldToTileCoordinates(entity.position.x + TILE_SIZE / 2, entity.position.y, &gridX, &gridY);
-	if (!(gridX < 0 || gridX > mapWidth || gridY < 0 || gridY > mapHeight) && levelData[gridY][gridX] < 18)
+
+	//check left
+	worldToTileCoordinates(entity.position.x, entity.position.y + 0.008, &gridX, &gridY);
+	if (!(gridX < 0 || gridX > mapWidth || gridY < 0 || gridY > mapHeight) && levelData[gridY][gridX] < 18 || (entity.type == "player" && gridY - 1 >= 0 && levelData[gridY - 1][gridX] < 18))
 	{
-		entity.position.x += entity.position.x + TILE_SIZE / 2 - gridX * TILE_SIZE - TILE_SIZE / 2;
+		entity.position.x += 1 * (entity.position.x) - gridX * TILE_SIZE - TILE_SIZE + 0.008;
 		entity.velocity.x = 0;
 		entity.acceleration.x = 0;
+		entity.collidedLeft = true;
+	}
+	worldToTileCoordinates(entity.position.x, entity.position.y + TILE_SIZE - 0.008, &gridX, &gridY);
+	if (!(gridX < 0 || gridX > mapWidth || gridY < 0 || gridY > mapHeight) && levelData[gridY][gridX] < 18 || (entity.type == "player" && gridY - 1 >= 0 && levelData[gridY - 1][gridX] < 18))
+	{
+		entity.position.x += 1 * (entity.position.x) - gridX * TILE_SIZE - TILE_SIZE + 0.008;
+		entity.velocity.x = 0;
+		entity.acceleration.x = 0;
+		entity.collidedLeft = true;
+	}
+	//check right
+	worldToTileCoordinates(entity.position.x + TILE_SIZE, entity.position.y + 0.008, &gridX, &gridY);
+	if (!(gridX < 0 || gridX > mapWidth || gridY < 0 || gridY > mapHeight) && levelData[gridY][gridX] < 18 || (entity.type == "player" && gridY - 1 >= 0 && levelData[gridY - 1][gridX] < 18))
+	{
+		entity.position.x += 1 * (entity.position.x) - gridX * TILE_SIZE + TILE_SIZE - 0.008;
+		entity.velocity.x = 0;
+		entity.acceleration.x = 0;
+		entity.collidedRight = true;
+	}
+	worldToTileCoordinates(entity.position.x + TILE_SIZE, entity.position.y + TILE_SIZE - 0.008, &gridX, &gridY);
+	if (!(gridX < 0 || gridX > mapWidth || gridY < 0 || gridY > mapHeight) && levelData[gridY][gridX] < 18 || (entity.type == "player" && gridY - 1 >= 0 && levelData[gridY - 1][gridX] < 18))
+	{
+		entity.position.x += 1 * (entity.position.x) - gridX * TILE_SIZE + TILE_SIZE - 0.008;
+		entity.velocity.x = 0;
+		entity.acceleration.x = 0;
+		entity.collidedRight = true;
 	}
 }
 
@@ -277,7 +305,14 @@ void collisiony(Entity &entity) {
 		top = TILE_SIZE;
 	}
 	//check bottom
-	worldToTileCoordinates(entity.position.x + TILE_SIZE / 2, entity.position.y, &gridX, &gridY);
+	worldToTileCoordinates(entity.position.x + 0.008, entity.position.y, &gridX, &gridY);
+	if (!(gridX < 0 || gridX > mapWidth || gridY < 0 || gridY > mapHeight) && levelData[gridY][gridX] < 18)
+	{
+		entity.position.y += -1 * (entity.position.y) - gridY * TILE_SIZE + 0.001;
+		entity.velocity.y = 0;
+		entity.collidedBottom = true;
+	}
+	worldToTileCoordinates(entity.position.x + TILE_SIZE - 0.008, entity.position.y, &gridX, &gridY);
 	if (!(gridX < 0 || gridX > mapWidth || gridY < 0 || gridY > mapHeight) && levelData[gridY][gridX] < 18)
 	{
 		entity.position.y += -1 * (entity.position.y) - gridY * TILE_SIZE + 0.001;
@@ -285,7 +320,14 @@ void collisiony(Entity &entity) {
 		entity.collidedBottom = true;
 	}
 	//check top
-	worldToTileCoordinates(entity.position.x + TILE_SIZE / 2, entity.position.y + TILE_SIZE + top, &gridX, &gridY);
+	worldToTileCoordinates(entity.position.x + 0.008, entity.position.y + TILE_SIZE + top, &gridX, &gridY);
+	if (!(gridX < 0 || gridX > mapWidth || gridY < 0 || gridY > mapHeight) && levelData[gridY][gridX] < 18)
+	{
+		entity.position.y += -1 * (entity.position.y + TILE_SIZE + top) - gridY * TILE_SIZE - TILE_SIZE - 0.001;
+		entity.velocity.y = 0;
+		entity.collidedTop = true;
+	}
+	worldToTileCoordinates(entity.position.x + TILE_SIZE - 0.008, entity.position.y + TILE_SIZE + top, &gridX, &gridY);
 	if (!(gridX < 0 || gridX > mapWidth || gridY < 0 || gridY > mapHeight) && levelData[gridY][gridX] < 18)
 	{
 		entity.position.y += -1 * (entity.position.y + TILE_SIZE + top) - gridY * TILE_SIZE - TILE_SIZE - 0.001;
@@ -304,6 +346,44 @@ bool entityCollision(Entity e1, Entity e2) {
 		e1.position.x + TILE_SIZE / 2 < e2.position.x - TILE_SIZE / 2 ||
 		e1.position.y - TILE_SIZE / 2 > e2.position.y + TILE_SIZE / 2 ||
 		e1.position.y + TILE_SIZE / 2 + top < e2.position.y - TILE_SIZE / 2));
+}
+
+#define FIXED_TIMESTEP 0.0166666f
+#define MAX_TIMESTEPS 6
+void Update(float p1ax, float p1vy, float ticks, float time) {
+	for (int i = 0; i < entities.size(); ++i) {
+		if (entities[i].type == "player") {
+			entities[i].acceleration.x = p1ax;
+			if (entities[i].collidedBottom) {
+				entities[i].velocity.y = p1vy;
+			}
+		}
+		else if (entities[i].type == "gear") {
+			entities[i].position.y += 0.001 * sin(ticks * 10 / PI);
+		}
+		if (!entities[i].isStatic) {
+			entities[i].acceleration.y = -5;
+		}
+		entities[i].collidedTop = false;
+		entities[i].collidedBottom = false;
+		entities[i].collidedLeft = false;
+		entities[i].collidedRight = false;
+
+		entities[i].velocity.x = lerp(entities[i].velocity.x, 0.0f, time * 5);
+		entities[i].velocity.y = lerp(entities[i].velocity.y, 0.0f, time * 1);
+
+		entities[i].velocity.x += entities[i].acceleration.x * time;
+		entities[i].velocity.y += entities[i].acceleration.y * time;
+
+		entities[i].position.y += entities[i].velocity.y * time;
+		if (!entities[i].isStatic) {
+			collisiony(entities[i]);
+		}
+		entities[i].position.x += entities[i].velocity.x * time;
+		if (!entities[i].isStatic) {
+			collisionx(entities[i]);
+		}
+	}
 }
 
 
@@ -363,28 +443,11 @@ int main(int argc, char *argv[])
 	int inactiveBullet = 6; //current inactive bullet index
 	enum GameState { STATE_MAIN_MENU, STATE_GAME_LEVEL };
 	int state = STATE_MAIN_MENU;
-	int p1ax = 0;
+	float p1ax = 0.0f;
 
 	SDL_Event event;
 	bool done = false;
 	while (!done) {
-
-		float ticks = (float)SDL_GetTicks() / 1000.0f;
-		float elapsed = ticks - lastFrameTicks;
-		lastFrameTicks = ticks;
-
-		// 60 FPS (1.0f/60.0f)
-		#define FIXED_TIMESTEP 0.0166666f
-		#define MAX_TIMESTEPS 6
-		float fixedElapsed = elapsed;
-		if (fixedElapsed > FIXED_TIMESTEP * MAX_TIMESTEPS) {
-			fixedElapsed = FIXED_TIMESTEP * MAX_TIMESTEPS;
-		}
-		while (fixedElapsed >= FIXED_TIMESTEP) {
-			fixedElapsed -= FIXED_TIMESTEP;
-			//Update(FIXED_TIMESTEP);
-		}
-		//Update(fixedElapsed);
 
 		switch (state) {
 
@@ -451,8 +514,23 @@ int main(int argc, char *argv[])
 				}
 			}
 
+			float ticks = (float)SDL_GetTicks() / 1000.0f;
+			float elapsed = ticks - lastFrameTicks;
+			lastFrameTicks = ticks;
+
+			// 60 FPS (1.0f/60.0f)
+			float fixedElapsed = elapsed;
+			if (fixedElapsed > FIXED_TIMESTEP * MAX_TIMESTEPS) {
+				fixedElapsed = FIXED_TIMESTEP * MAX_TIMESTEPS;
+			}
+			while (fixedElapsed >= FIXED_TIMESTEP) {
+				fixedElapsed -= FIXED_TIMESTEP;
+				Update(p1ax, p1vy, ticks, FIXED_TIMESTEP);
+			}
+			Update(p1ax, p1vy, ticks, fixedElapsed);
+
 			////////MOVEMENT//////////////////////////////////////////////////////////////////////////////////
-			for (int i = 0; i < entities.size(); ++i) {
+			/*for (int i = 0; i < entities.size(); ++i) {
 				if (entities[i].type == "player") {
 					entities[i].acceleration.x = p1ax;
 					if (entities[i].collidedBottom) {
@@ -484,7 +562,7 @@ int main(int argc, char *argv[])
 				if (!entities[i].isStatic) {
 					collisiony(entities[i]);
 				}
-			}
+			}*/
 
 			////////ENTITY COLLISION//////////////////////////////////////////////////////////////////////////
 			for (int i = 0; i < entities.size(); ++i) {
