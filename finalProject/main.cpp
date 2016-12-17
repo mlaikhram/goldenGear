@@ -657,16 +657,16 @@ void game_over(ShaderProgram &program, GLuint &gameOverPage, GLuint &letters) {
 	SDL_GL_SwapWindow(displayWindow);
 }
 
+int gearCount = 0;
+int NUM_SHIFT = 48;
 void level_clear() {
 	//empty the level
-	/*levelData = new unsigned char*[mapHeight];
-	for (int i = 0; i < mapHeight; ++i) {
-	levelData[i] = new unsigned char[mapWidth];*/
 	entities.clear();
 	for (int i = 0; i < mapHeight; ++i) {
 		delete[] levelData[i];
 	}
 	delete[] levelData;
+	gearCount = 0;
 }
 
 int main(int argc, char *argv[])
@@ -713,6 +713,9 @@ int main(int argc, char *argv[])
 
 	float p1vy = 0;
 	float p1ax = 0.0f;
+
+	//int gearCount = 0; // ----------------------------------------
+	int gearCountArr[] = { NUM_SHIFT, NUM_SHIFT, NUM_SHIFT };
 
 	while (!done) {
 
@@ -787,20 +790,24 @@ int main(int argc, char *argv[])
 			for (int i = 0; i < entities.size(); ++i) {
 				if (entities[i].type == "player") {
 					for (int j = 0; j < entities.size(); ++j) {
-						if (entities[j].type == "gear" && entityCollision(entities[i], entities[j])) {
-							entities[j].exists = false;
-							//gearcount++;
-							break;
-						}
-						else if (entities[j].type == "silverGear" && entityCollision(entities[i], entities[j])) {
-							entities[j].exists = false;
-							//gearcount += 10;
-							break;
-						}
-						else if (entities[j].type == "crab" && entityCollision(entities[i], entities[j])) {
-							//entities[j].exists = false;
-							state = STATE_GAME_OVER;
-							break;
+						if (entities[j].exists) {
+
+							if (entities[j].type == "gear" && entityCollision(entities[i], entities[j])) {
+								entities[j].exists = false;
+								gearCount++;
+								break;
+							}
+							else if (entities[j].type == "silverGear" && entityCollision(entities[i], entities[j])) {
+								entities[j].exists = false;
+								gearCount += 10;
+								break;
+							}
+							else if (entities[j].type == "crab" && entityCollision(entities[i], entities[j])) {
+								//entities[j].exists = false;
+								state = STATE_GAME_OVER;
+								break;
+							}
+
 						}
 					}
 					break;
@@ -905,6 +912,23 @@ int main(int argc, char *argv[])
 					}
 				}
 			}			
+
+			gearCountArr[0] = NUM_SHIFT + gearCount / 100;
+			gearCountArr[1] = NUM_SHIFT + gearCount / 10 % 10;
+			gearCountArr[2] = NUM_SHIFT + gearCount % 10;
+
+			for (int i = 0; i < 3; ++i) { // Length of gearCountArr
+				if (gearCountArr[i] != -1) {
+					modelMatrix.identity();
+					modelMatrix.Translate(entities[pIndex].position.x, entities[pIndex].position.y + mapHeight*TILE_SIZE, 0);
+					modelMatrix.Translate(3.0 + i*.2, 1.9, 0);
+					program.setModelMatrix(modelMatrix);
+					program.setProjectionMatrix(projectionMatrix);
+					program.setViewMatrix(viewMatrix);
+					DrawSpriteSheetSprite(&program, gearCountArr[i], 16, 16, letters);
+				}
+			}
+
 			SDL_GL_SwapWindow(displayWindow);
 			if (state == STATE_GAME_OVER)
 				level_clear();
