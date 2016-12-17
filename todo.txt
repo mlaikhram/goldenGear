@@ -1,5 +1,5 @@
 Bugfixes:
-Fix timestep
+//Fix timestep
 //Fix left/right hitboxes
 Fix height hitbox -- only when collecting objects (world height hitbox works fine)
 
@@ -23,7 +23,7 @@ Add star functionality
 
 General:
 Add level select menu
-Add game over screen
+Add death scenes
 Add more levels
 Add boss fight
 Save current gear count and only spawn in gears that have not been collected
