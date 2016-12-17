@@ -83,10 +83,11 @@ class Entity {
 public:
 	//Entity() { Entity(Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), 0.0f, SheetSprite()); }
 	//Entity(Vector3 position, Vector3 velocity, Vector3 size, float rotation, SheetSprite sprite) : position(position), velocity(velocity), size(size), rotation(rotation), sprite(sprite) {}
-	Entity(std::string type, bool isStatic, Vector3 position, Vector3 velocity = Vector3(0, 0, 0), Vector3 acceleration = Vector3(0, 0, 0), Vector3 size = Vector3(0, 0, 0), float rotation = 0.0f) : 
-		type(type), isStatic(isStatic), position(position), velocity(velocity), acceleration(acceleration), size(size), rotation(rotation), collidedTop(false), collidedBottom(false), collidedLeft(false), collidedRight(false) {}
+	Entity(std::string type, bool isStatic, Vector3 position, Vector3 velocity = Vector3(0, 0, 0), Vector3 acceleration = Vector3(0, 0, 0), Vector3 size = Vector3(0, 0, 0), float rotation = 0.0f) :
+		type(type), isStatic(isStatic), position(position), velocity(velocity), acceleration(acceleration), size(size), rotation(rotation), exists(true), collidedTop(false), collidedBottom(false), collidedLeft(false), collidedRight(false) {}
 	//void Draw();
 	std::string type;
+	bool exists;
 	bool isStatic;
 	Vector3 position;
 	Vector3 velocity;
@@ -212,11 +213,15 @@ bool readLayerData(std::ifstream &stream) {
 }
 
 std::vector<Entity> entities;
+int pIndex;
 
 void placeEntity(std::string type, float x, float y) {
 	bool isStatic = true;
 	if (type == "player" || type == "crab") {
 		isStatic = false;
+	}
+	if (type == "player") {
+		pIndex = entities.size();
 	}
 	Entity entity(type, isStatic, Vector3(x, y, 0));
 	entities.push_back(entity);
@@ -348,6 +353,11 @@ bool entityCollision(Entity e1, Entity e2) {
 		e1.position.y + TILE_SIZE / 2 + top < e2.position.y - TILE_SIZE / 2));
 }
 
+float distance(double x1, double y1, double x2, double y2) {
+	return sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
+}
+
+
 #define FIXED_TIMESTEP 0.0166666f
 #define MAX_TIMESTEPS 6
 void Update(float p1ax, float p1vy, float ticks, float time) {
@@ -449,7 +459,6 @@ int main(int argc, char *argv[])
 	int state = STATE_MAIN_MENU;
 	float p1ax = 0.0f;
 
-	//float vertices[] = { -2.5, -2.5, 2.5, -2.5, 2.5, 2.5, -2.5, -2.5, 2.5, 2.5, -2.5, 2.5 };
 	float vertices[] = { -3.55, -2.0, 3.55, -2.0, 3.55, 2.0, -3.55, -2.0, 3.55, 2.0, -3.55, 2.0 };
 	float texCoords[] = { 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0 };
 	GLuint controlsPage = LoadTexture("controls.png");
@@ -658,7 +667,8 @@ int main(int argc, char *argv[])
 				if (entities[i].type == "player") {
 					for (int j = 0; j < entities.size(); ++j) {
 						if (entities[j].type == "gear" && entityCollision(entities[i], entities[j])) {
-							entities.erase(entities.begin() + j);
+							//entities.erase(entities.begin() + j);
+							entities[j].exists = false;
 							break;
 						}
 					}
@@ -668,6 +678,11 @@ int main(int argc, char *argv[])
 
 			///////DRAWING////////////////////////////////////////////////////////////////////////////////////
 			glClear(GL_COLOR_BUFFER_BIT);
+
+			double minDist = 1000000000;
+			int minx = -1;
+			int miny = -1;
+
 			for (int y = 0; y < mapHeight; ++y) {
 				for (int x = 0; x < mapWidth; ++x) {
 					modelMatrix.identity();
@@ -677,37 +692,86 @@ int main(int argc, char *argv[])
 					program.setProjectionMatrix(projectionMatrix);
 					program.setViewMatrix(viewMatrix);
 					DrawSpriteSheetSprite(&program, levelData[y][x], 20, 10, goldenGearSpriteSheet);
+					
+					int mx, my;
+
+					float units_x = (((float)event.motion.x / 1280) * 7.1f) - 3.55f + entities[pIndex].position.x + TILE_SIZE / 2;
+					float units_y = (((float)(720 - event.motion.y) / 720) * 4.0f) - 2.0f + entities[pIndex].position.y + mapHeight*TILE_SIZE + TILE_SIZE / 2;
+					worldToTileCoordinates(units_x, units_y, &mx, &my);
+					my = my + mapHeight - 1;
+
+					if (levelData[y][x] >= 9 && levelData[y][x] <= 12 && distance(mx, my, x, y) < minDist) {
+						minDist = distance(mx, my, x, y);
+						minx = x;
+						miny = y;					
+					}
+					/*
+					if (levelData[y][x] >= 9 && levelData[y][x] <= 12 && mx == x && my == y) {
+						modelMatrix.identity();
+						//modelMatrix.Translate(x*TILE_SIZE - (3.55 - TILE_SIZE/2),(32-y - 1)*TILE_SIZE - (2.0f - TILE_SIZE/2), 0);
+						modelMatrix.Translate(x*TILE_SIZE, (mapHeight - y - 1)*TILE_SIZE, 0);
+						program.setModelMatrix(modelMatrix);
+						program.setProjectionMatrix(projectionMatrix);
+						program.setViewMatrix(viewMatrix);
+						DrawSpriteSheetSprite(&program, 27, 20, 10, goldenGearSpriteSheet);
+					}*/
+
 				}
 			}
-			std::vector<std::string> types = {"gear", "goldenGear", "crab", "star", "bullet"};
-			for (int i = 0; i < entities.size(); ++i) {
+			if (minx >= 0 && miny >= 0) {
 				modelMatrix.identity();
-				//modelMatrix.Translate(entities[i].position.x - 3.55 + TILE_SIZE / 2, entities[i].position.y + TILE_SIZE / 2 + (mapHeight*TILE_SIZE - 2.0f), 0);
-				modelMatrix.Translate(entities[i].position.x, entities[i].position.y + mapHeight*TILE_SIZE, 0);
-				if (entities[i].type == "gear") {
-					modelMatrix.Rotate(-1*ticks);
-				}
+				modelMatrix.Translate(minx*TILE_SIZE, (mapHeight - miny - 1)*TILE_SIZE, 0);
 				program.setModelMatrix(modelMatrix);
 				program.setProjectionMatrix(projectionMatrix);
 				program.setViewMatrix(viewMatrix);
-				if (entities[i].type == "player") {
-					DrawSpriteSheetSprite(&program, 60, 20, 10, goldenGearSpriteSheet);
+				DrawSpriteSheetSprite(&program, 27, 20, 10, goldenGearSpriteSheet);
+			}
+			/*
+			int mx;
+			int my;
+			float units_x = (((float)event.motion.x / 1280) * 7.1f) - 3.55f;
+			float units_y = (((float)(720 - event.motion.y) / 720) * 4.0f) - 2.0f;
+			worldToTileCoordinates(units_x, units_y, &mx, &my);
 
+			modelMatrix.identity();
+			//modelMatrix.Translate(x*TILE_SIZE - (3.55 - TILE_SIZE/2),(32-y - 1)*TILE_SIZE - (2.0f - TILE_SIZE/2), 0);
+			modelMatrix.Translate(mx*TILE_SIZE, (mapHeight - my - 1)*TILE_SIZE, 0);
+			program.setModelMatrix(modelMatrix);
+			program.setProjectionMatrix(projectionMatrix);
+			program.setViewMatrix(viewMatrix);
+			DrawSpriteSheetSprite(&program, 27, 20, 10, goldenGearSpriteSheet);
+			*/
+			std::vector<std::string> types = {"gear", "goldenGear", "crab", "star", "bullet"};
+			for (int i = 0; i < entities.size(); ++i) {
+				if (entities[i].exists) {
 					modelMatrix.identity();
-					//modelMatrix.Translate(entities[i].position.x - 3.55 + TILE_SIZE / 2, entities[i].position.y + 3 * TILE_SIZE / 2 + (mapHeight*TILE_SIZE - 2.0f), 0);
-					modelMatrix.Translate(entities[i].position.x, entities[i].position.y + mapHeight*TILE_SIZE + TILE_SIZE, 0);
-
+					//modelMatrix.Translate(entities[i].position.x - 3.55 + TILE_SIZE / 2, entities[i].position.y + TILE_SIZE / 2 + (mapHeight*TILE_SIZE - 2.0f), 0);
+					modelMatrix.Translate(entities[i].position.x, entities[i].position.y + mapHeight*TILE_SIZE, 0);
+					if (entities[i].type == "gear" || entities[i].type == "silverGear" || entities[i].type == "target") {
+						modelMatrix.Rotate(-1 * ticks);
+					}
 					program.setModelMatrix(modelMatrix);
 					program.setProjectionMatrix(projectionMatrix);
 					program.setViewMatrix(viewMatrix);
-					DrawSpriteSheetSprite(&program, 40, 20, 10, goldenGearSpriteSheet);
+					if (entities[i].type == "player") {
+						DrawSpriteSheetSprite(&program, 60, 20, 10, goldenGearSpriteSheet);
 
-					viewMatrix.identity();
-					viewMatrix.Translate(-entities[i].position.x, -1 * (entities[i].position.y + mapHeight*TILE_SIZE), 0);
-				}
-				else {
-					int pos = find(types.begin(), types.end(), entities[i].type) - types.begin();
-					DrawSpriteSheetSprite(&program, pos + 24, 20, 10, goldenGearSpriteSheet);
+						modelMatrix.identity();
+						//modelMatrix.Translate(entities[i].position.x - 3.55 + TILE_SIZE / 2, entities[i].position.y + 3 * TILE_SIZE / 2 + (mapHeight*TILE_SIZE - 2.0f), 0);
+						modelMatrix.Translate(entities[i].position.x, entities[i].position.y + mapHeight*TILE_SIZE + TILE_SIZE, 0);
+
+						program.setModelMatrix(modelMatrix);
+						program.setProjectionMatrix(projectionMatrix);
+						program.setViewMatrix(viewMatrix);
+						DrawSpriteSheetSprite(&program, 40, 20, 10, goldenGearSpriteSheet);
+
+						viewMatrix.identity();
+						viewMatrix.Translate(-entities[i].position.x, -1 * (entities[i].position.y + mapHeight*TILE_SIZE), 0);
+					}
+					else {
+						int pos = find(types.begin(), types.end(), entities[i].type) - types.begin();
+						DrawSpriteSheetSprite(&program, pos + 24, 20, 10, goldenGearSpriteSheet);
+					}
 				}
 			}			
 			SDL_GL_SwapWindow(displayWindow);
