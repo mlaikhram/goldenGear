@@ -409,9 +409,7 @@ int state = STATE_MAIN_MENU;
 SDL_Event event;
 bool done = false;
 
-void main_menu(ShaderProgram &program) {
-
-	GLuint letters = LoadTexture("letters.png");
+void main_menu(ShaderProgram &program, GLuint &letters) {
 
 	int playGameArr[] = { P, L, A, Y, -1, G, A, M, E };
 	int controlsArr[] = { C, O, N, T, R, O, L, S };
@@ -482,7 +480,7 @@ void main_menu(ShaderProgram &program) {
 	SDL_GL_SwapWindow(displayWindow);
 }
 
-void controls(ShaderProgram &program) {
+void controls(ShaderProgram &program, GLuint &controlsPage) {
 
 	while (SDL_PollEvent(&event)) {
 		if (event.type == SDL_QUIT || event.type == SDL_WINDOWEVENT_CLOSE) {
@@ -499,7 +497,6 @@ void controls(ShaderProgram &program) {
 
 	float vertices[] = { -3.55, -2.0, 3.55, -2.0, 3.55, 2.0, -3.55, -2.0, 3.55, 2.0, -3.55, 2.0 };
 	float texCoords[] = { 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0 };
-	GLuint controlsPage = LoadTexture("controls.png");
 
 	program.setModelMatrix(modelMatrix);
 	program.setProjectionMatrix(projectionMatrix);
@@ -543,6 +540,8 @@ int main(int argc, char *argv[])
 	ShaderProgram program(RESOURCE_FOLDER"vertex_textured.glsl", RESOURCE_FOLDER"fragment_textured.glsl");
 	float lastFrameTicks = 0.0f;
 	
+	GLuint controlsPage = LoadTexture("controls.png");
+	GLuint letters = LoadTexture("letters.png");
 	GLuint goldenGearSpriteSheet = LoadTexture("golden_gear_spritesheet.png");
 	//GLuint spriteSheet = LoadTexture("spritesheet.png");
 
@@ -573,11 +572,11 @@ int main(int argc, char *argv[])
 		switch (state) {
 
 		case STATE_MAIN_MENU:
-			main_menu(program);
+			main_menu(program, letters);
 			break;
 
 		case STATE_CONTROLS:
-			controls(program);
+			controls(program, controlsPage);
 			break;
 
 		case STATE_GAME_LEVEL:
@@ -711,7 +710,7 @@ int main(int argc, char *argv[])
 			program.setViewMatrix(viewMatrix);
 			DrawSpriteSheetSprite(&program, 27, 20, 10, goldenGearSpriteSheet);
 			*/
-			std::vector<std::string> types = {"gear", "goldenGear", "crab", "star", "bullet"};
+			std::vector<std::string> types = {"gear", "silverGear", "goldenGear", "target", "crab", "star", "bullet"};
 			for (int i = 0; i < entities.size(); ++i) {
 				if (entities[i].exists) {
 					modelMatrix.identity();

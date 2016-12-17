@@ -252,11 +252,6 @@ location=59,16,1,1
 [objectLayer]
 # gear
 type=gear
-location=57,15,1,1
-
-[objectLayer]
-# gear
-type=gear
 location=49,15,1,1
 
 [objectLayer]
@@ -450,19 +445,34 @@ type=gear
 location=57,27,1,1
 
 [objectLayer]
-# gear
-type=gear
-location=67,30,1,1
+# silverGear
+type=silverGear
+location=57,15,1,1
 
 [objectLayer]
-# star
-type=star
-location=68,16,1,1
+# silverGear
+type=silverGear
+location=67,30,1,1
 
 [objectLayer]
 # crab
 type=crab
-location=51,30,1,1
+location=52,30,1,1
+
+[objectLayer]
+# crab
+type=crab
+location=19,27,1,1
+
+[objectLayer]
+# star
+type=star
+location=21,11,1,1
+
+[objectLayer]
+# star
+type=star
+location=65,17,1,1
 
 [objectLayer]
 # player
