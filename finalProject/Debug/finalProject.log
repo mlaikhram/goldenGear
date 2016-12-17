@@ -1,53 +1,40 @@
-﻿Build started 12/17/2016 2:33:07 AM.
-     1>Project "E:\MATT\2\CS3113\finalProject\finalProject\finalProject.vcxproj" on node 2 (Build target(s)).
-     1>ClCompile:
-         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /IC:\SDL2\include /IC:\SDL2_image\include /IC:\glew\include /IC:\SDL2_mixer\include /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D _WINDOWS /D _MBCS /D _MBCS /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt main.cpp
-         main.cpp
-     1>e:\matt\2\cs3113\finalproject\finalproject\main.cpp(118): warning C4305: 'initializing' : truncation from 'double' to 'float'
-     1>e:\matt\2\cs3113\finalproject\finalproject\main.cpp(123): warning C4244: 'initializing' : conversion from 'double' to 'float', possible loss of data
-     1>e:\matt\2\cs3113\finalproject\finalproject\main.cpp(124): warning C4244: 'initializing' : conversion from 'double' to 'float', possible loss of data
-     1>e:\matt\2\cs3113\finalproject\finalproject\main.cpp(258): warning C4244: 'return' : conversion from 'double' to 'float', possible loss of data
-     1>e:\matt\2\cs3113\finalproject\finalproject\main.cpp(271): warning C4244: 'argument' : conversion from 'double' to 'float', possible loss of data
-     1>e:\matt\2\cs3113\finalproject\finalproject\main.cpp(274): warning C4244: '+=' : conversion from 'double' to 'float', possible loss of data
-     1>e:\matt\2\cs3113\finalproject\finalproject\main.cpp(279): warning C4244: 'argument' : conversion from 'double' to 'float', possible loss of data
-     1>e:\matt\2\cs3113\finalproject\finalproject\main.cpp(282): warning C4244: '+=' : conversion from 'double' to 'float', possible loss of data
-     1>e:\matt\2\cs3113\finalproject\finalproject\main.cpp(288): warning C4244: 'argument' : conversion from 'double' to 'float', possible loss of data
-     1>e:\matt\2\cs3113\finalproject\finalproject\main.cpp(291): warning C4244: '+=' : conversion from 'double' to 'float', possible loss of data
-     1>e:\matt\2\cs3113\finalproject\finalproject\main.cpp(296): warning C4244: 'argument' : conversion from 'double' to 'float', possible loss of data
-     1>e:\matt\2\cs3113\finalproject\finalproject\main.cpp(299): warning C4244: '+=' : conversion from 'double' to 'float', possible loss of data
-     1>e:\matt\2\cs3113\finalproject\finalproject\main.cpp(313): warning C4244: 'argument' : conversion from 'double' to 'float', possible loss of data
-     1>e:\matt\2\cs3113\finalproject\finalproject\main.cpp(316): warning C4244: '+=' : conversion from 'double' to 'float', possible loss of data
-     1>e:\matt\2\cs3113\finalproject\finalproject\main.cpp(320): warning C4244: 'argument' : conversion from 'double' to 'float', possible loss of data
-     1>e:\matt\2\cs3113\finalproject\finalproject\main.cpp(323): warning C4244: '+=' : conversion from 'double' to 'float', possible loss of data
-     1>e:\matt\2\cs3113\finalproject\finalproject\main.cpp(328): warning C4244: 'argument' : conversion from 'double' to 'float', possible loss of data
-     1>e:\matt\2\cs3113\finalproject\finalproject\main.cpp(331): warning C4244: '+=' : conversion from 'double' to 'float', possible loss of data
-     1>e:\matt\2\cs3113\finalproject\finalproject\main.cpp(335): warning C4244: 'argument' : conversion from 'double' to 'float', possible loss of data
-     1>e:\matt\2\cs3113\finalproject\finalproject\main.cpp(338): warning C4244: '+=' : conversion from 'double' to 'float', possible loss of data
-     1>e:\matt\2\cs3113\finalproject\finalproject\main.cpp(347): warning C4244: '=' : conversion from 'float' to 'int', possible loss of data
-     1>e:\matt\2\cs3113\finalproject\finalproject\main.cpp(357): warning C4244: 'return' : conversion from 'double' to 'float', possible loss of data
-     1>e:\matt\2\cs3113\finalproject\finalproject\main.cpp(364): warning C4018: '<' : signed/unsigned mismatch
-     1>e:\matt\2\cs3113\finalproject\finalproject\main.cpp(372): warning C4244: '+=' : conversion from 'double' to 'float', possible loss of data
-     1>e:\matt\2\cs3113\finalproject\finalproject\main.cpp(450): warning C4244: 'argument' : conversion from 'double' to 'float', possible loss of data
-     1>e:\matt\2\cs3113\finalproject\finalproject\main.cpp(461): warning C4244: 'argument' : conversion from 'double' to 'float', possible loss of data
-     1>e:\matt\2\cs3113\finalproject\finalproject\main.cpp(472): warning C4244: 'argument' : conversion from 'double' to 'float', possible loss of data
-     1>e:\matt\2\cs3113\finalproject\finalproject\main.cpp(508): warning C4305: 'initializing' : truncation from 'double' to 'float'
-     1>e:\matt\2\cs3113\finalproject\finalproject\main.cpp(561): warning C4305: 'initializing' : truncation from 'double' to 'float'
-     1>e:\matt\2\cs3113\finalproject\finalproject\main.cpp(578): warning C4305: 'argument' : truncation from 'double' to 'float'
-     1>e:\matt\2\cs3113\finalproject\finalproject\main.cpp(578): warning C4244: 'argument' : conversion from 'double' to 'float', possible loss of data
-     1>e:\matt\2\cs3113\finalproject\finalproject\main.cpp(589): warning C4305: 'argument' : truncation from 'double' to 'float'
-     1>e:\matt\2\cs3113\finalproject\finalproject\main.cpp(589): warning C4244: 'argument' : conversion from 'double' to 'float', possible loss of data
-     1>e:\matt\2\cs3113\finalproject\finalproject\main.cpp(640): warning C4305: 'argument' : truncation from 'double' to 'float'
-     1>e:\matt\2\cs3113\finalproject\finalproject\main.cpp(677): warning C4305: '=' : truncation from 'double' to 'float'
-     1>e:\matt\2\cs3113\finalproject\finalproject\main.cpp(715): warning C4018: '<' : signed/unsigned mismatch
-     1>e:\matt\2\cs3113\finalproject\finalproject\main.cpp(717): warning C4018: '<' : signed/unsigned mismatch
-     1>e:\matt\2\cs3113\finalproject\finalproject\main.cpp(794): warning C4018: '<' : signed/unsigned mismatch
-       Link:
-         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"E:\MATT\2\CS3113\finalProject\Debug\finalProject.exe" /INCREMENTAL /NOLOGO /LIBPATH:C:\SDL2_mixer\lib\x86 /LIBPATH:C:\SDL2\lib\x86 /LIBPATH:C:\SDL2_image\lib\x86 /LIBPATH:C:\glew\lib\Release\Win32 SDL2.lib SDL2_mixer.lib glew32.lib SDL2main.lib SDL2_image.lib OpenGL32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"E:\MATT\2\CS3113\finalProject\Debug\finalProject.pdb" /SUBSYSTEM:WINDOWS /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"E:\MATT\2\CS3113\finalProject\Debug\finalProject.lib" /MACHINE:X86 Debug\main.obj
-         Debug\Matrix.obj
-         Debug\ShaderProgram.obj
-         finalProject.vcxproj -> E:\MATT\2\CS3113\finalProject\Debug\finalProject.exe
-     1>Done Building Project "E:\MATT\2\CS3113\finalProject\finalProject\finalProject.vcxproj" (Build target(s)).
-
-Build succeeded.
-
-Time Elapsed 00:00:01.11
+﻿  main.cpp
+c:\users\matthew\desktop\gitstuff\mkl\cs3113\finalproject\finalproject\main.cpp(118): warning C4305: 'initializing' : truncation from 'double' to 'float'
+c:\users\matthew\desktop\gitstuff\mkl\cs3113\finalproject\finalproject\main.cpp(123): warning C4244: 'initializing' : conversion from 'double' to 'float', possible loss of data
+c:\users\matthew\desktop\gitstuff\mkl\cs3113\finalproject\finalproject\main.cpp(124): warning C4244: 'initializing' : conversion from 'double' to 'float', possible loss of data
+c:\users\matthew\desktop\gitstuff\mkl\cs3113\finalproject\finalproject\main.cpp(258): warning C4244: 'return' : conversion from 'double' to 'float', possible loss of data
+c:\users\matthew\desktop\gitstuff\mkl\cs3113\finalproject\finalproject\main.cpp(280): warning C4244: 'argument' : conversion from 'double' to 'float', possible loss of data
+c:\users\matthew\desktop\gitstuff\mkl\cs3113\finalproject\finalproject\main.cpp(287): warning C4244: '+=' : conversion from 'double' to 'float', possible loss of data
+c:\users\matthew\desktop\gitstuff\mkl\cs3113\finalproject\finalproject\main.cpp(292): warning C4244: 'argument' : conversion from 'double' to 'float', possible loss of data
+c:\users\matthew\desktop\gitstuff\mkl\cs3113\finalproject\finalproject\main.cpp(299): warning C4244: '+=' : conversion from 'double' to 'float', possible loss of data
+c:\users\matthew\desktop\gitstuff\mkl\cs3113\finalproject\finalproject\main.cpp(305): warning C4244: 'argument' : conversion from 'double' to 'float', possible loss of data
+c:\users\matthew\desktop\gitstuff\mkl\cs3113\finalproject\finalproject\main.cpp(312): warning C4244: '+=' : conversion from 'double' to 'float', possible loss of data
+c:\users\matthew\desktop\gitstuff\mkl\cs3113\finalproject\finalproject\main.cpp(317): warning C4244: 'argument' : conversion from 'double' to 'float', possible loss of data
+c:\users\matthew\desktop\gitstuff\mkl\cs3113\finalproject\finalproject\main.cpp(324): warning C4244: '+=' : conversion from 'double' to 'float', possible loss of data
+c:\users\matthew\desktop\gitstuff\mkl\cs3113\finalproject\finalproject\main.cpp(338): warning C4244: 'argument' : conversion from 'double' to 'float', possible loss of data
+c:\users\matthew\desktop\gitstuff\mkl\cs3113\finalproject\finalproject\main.cpp(345): warning C4244: '+=' : conversion from 'double' to 'float', possible loss of data
+c:\users\matthew\desktop\gitstuff\mkl\cs3113\finalproject\finalproject\main.cpp(349): warning C4244: 'argument' : conversion from 'double' to 'float', possible loss of data
+c:\users\matthew\desktop\gitstuff\mkl\cs3113\finalproject\finalproject\main.cpp(356): warning C4244: '+=' : conversion from 'double' to 'float', possible loss of data
+c:\users\matthew\desktop\gitstuff\mkl\cs3113\finalproject\finalproject\main.cpp(361): warning C4244: 'argument' : conversion from 'double' to 'float', possible loss of data
+c:\users\matthew\desktop\gitstuff\mkl\cs3113\finalproject\finalproject\main.cpp(368): warning C4244: '+=' : conversion from 'double' to 'float', possible loss of data
+c:\users\matthew\desktop\gitstuff\mkl\cs3113\finalproject\finalproject\main.cpp(372): warning C4244: 'argument' : conversion from 'double' to 'float', possible loss of data
+c:\users\matthew\desktop\gitstuff\mkl\cs3113\finalproject\finalproject\main.cpp(379): warning C4244: '+=' : conversion from 'double' to 'float', possible loss of data
+c:\users\matthew\desktop\gitstuff\mkl\cs3113\finalproject\finalproject\main.cpp(388): warning C4244: '=' : conversion from 'float' to 'int', possible loss of data
+c:\users\matthew\desktop\gitstuff\mkl\cs3113\finalproject\finalproject\main.cpp(398): warning C4244: 'return' : conversion from 'double' to 'float', possible loss of data
+c:\users\matthew\desktop\gitstuff\mkl\cs3113\finalproject\finalproject\main.cpp(404): warning C4018: '<' : signed/unsigned mismatch
+c:\users\matthew\desktop\gitstuff\mkl\cs3113\finalproject\finalproject\main.cpp(412): warning C4244: '+=' : conversion from 'double' to 'float', possible loss of data
+c:\users\matthew\desktop\gitstuff\mkl\cs3113\finalproject\finalproject\main.cpp(487): warning C4244: 'argument' : conversion from 'double' to 'float', possible loss of data
+c:\users\matthew\desktop\gitstuff\mkl\cs3113\finalproject\finalproject\main.cpp(498): warning C4244: 'argument' : conversion from 'double' to 'float', possible loss of data
+c:\users\matthew\desktop\gitstuff\mkl\cs3113\finalproject\finalproject\main.cpp(509): warning C4244: 'argument' : conversion from 'double' to 'float', possible loss of data
+c:\users\matthew\desktop\gitstuff\mkl\cs3113\finalproject\finalproject\main.cpp(545): warning C4305: 'initializing' : truncation from 'double' to 'float'
+c:\users\matthew\desktop\gitstuff\mkl\cs3113\finalproject\finalproject\main.cpp(619): warning C4305: 'initializing' : truncation from 'double' to 'float'
+c:\users\matthew\desktop\gitstuff\mkl\cs3113\finalproject\finalproject\main.cpp(636): warning C4305: 'argument' : truncation from 'double' to 'float'
+c:\users\matthew\desktop\gitstuff\mkl\cs3113\finalproject\finalproject\main.cpp(636): warning C4244: 'argument' : conversion from 'double' to 'float', possible loss of data
+c:\users\matthew\desktop\gitstuff\mkl\cs3113\finalproject\finalproject\main.cpp(647): warning C4305: 'argument' : truncation from 'double' to 'float'
+c:\users\matthew\desktop\gitstuff\mkl\cs3113\finalproject\finalproject\main.cpp(647): warning C4244: 'argument' : conversion from 'double' to 'float', possible loss of data
+c:\users\matthew\desktop\gitstuff\mkl\cs3113\finalproject\finalproject\main.cpp(711): warning C4305: 'argument' : truncation from 'double' to 'float'
+c:\users\matthew\desktop\gitstuff\mkl\cs3113\finalproject\finalproject\main.cpp(749): warning C4305: '=' : truncation from 'double' to 'float'
+c:\users\matthew\desktop\gitstuff\mkl\cs3113\finalproject\finalproject\main.cpp(787): warning C4018: '<' : signed/unsigned mismatch
+c:\users\matthew\desktop\gitstuff\mkl\cs3113\finalproject\finalproject\main.cpp(789): warning C4018: '<' : signed/unsigned mismatch
+c:\users\matthew\desktop\gitstuff\mkl\cs3113\finalproject\finalproject\main.cpp(876): warning C4018: '<' : signed/unsigned mismatch
+  finalProject.vcxproj -> C:\Users\Matthew\Desktop\gitStuff\mkl\CS3113\finalProject\Debug\finalProject.exe

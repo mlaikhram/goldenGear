@@ -263,12 +263,25 @@ void worldToTileCoordinates(float worldX, float worldY, int *gridX, int *gridY) 
 	*gridY = (int)(-(worldY) / TILE_SIZE);
 }
 
+enum GameState { STATE_MAIN_MENU, STATE_CONTROLS, STATE_GAME_LEVEL, STATE_GAME_OVER };
+int state = STATE_MAIN_MENU;
+
+bool testOutOfBounds(int gridX, int gridY) {
+	if (gridX < 0 || gridX >= mapWidth || gridY < 0 || gridY >= mapHeight) {
+		return true;
+	}
+	return false;
+}
 
 void collisionx(Entity &entity) {
 	int gridX, gridY;
 
 	//check left
 	worldToTileCoordinates(entity.position.x, entity.position.y + 0.008, &gridX, &gridY);
+	if (testOutOfBounds(gridX, gridY) && entity.type == "player") {
+		state = STATE_GAME_OVER;
+		return;
+	}
 	if (!(gridX < 0 || gridX > mapWidth || gridY < 0 || gridY > mapHeight) && levelData[gridY][gridX] < 18 || (entity.type == "player" && gridY - 1 >= 0 && levelData[gridY - 1][gridX] < 18))
 	{
 		entity.position.x += 1 * (entity.position.x) - gridX * TILE_SIZE - TILE_SIZE + 0.008;
@@ -277,6 +290,10 @@ void collisionx(Entity &entity) {
 		entity.collidedLeft = true;
 	}
 	worldToTileCoordinates(entity.position.x, entity.position.y + TILE_SIZE - 0.008, &gridX, &gridY);
+	if (testOutOfBounds(gridX, gridY) && entity.type == "player") {
+		state = STATE_GAME_OVER;
+		return;
+	}
 	if (!(gridX < 0 || gridX > mapWidth || gridY < 0 || gridY > mapHeight) && levelData[gridY][gridX] < 18 || (entity.type == "player" && gridY - 1 >= 0 && levelData[gridY - 1][gridX] < 18))
 	{
 		entity.position.x += 1 * (entity.position.x) - gridX * TILE_SIZE - TILE_SIZE + 0.008;
@@ -286,6 +303,10 @@ void collisionx(Entity &entity) {
 	}
 	//check right
 	worldToTileCoordinates(entity.position.x + TILE_SIZE, entity.position.y + 0.008, &gridX, &gridY);
+	if (testOutOfBounds(gridX, gridY) && entity.type == "player") {
+		state = STATE_GAME_OVER;
+		return;
+	}
 	if (!(gridX < 0 || gridX > mapWidth || gridY < 0 || gridY > mapHeight) && levelData[gridY][gridX] < 18 || (entity.type == "player" && gridY - 1 >= 0 && levelData[gridY - 1][gridX] < 18))
 	{
 		entity.position.x += 1 * (entity.position.x) - gridX * TILE_SIZE + TILE_SIZE - 0.008;
@@ -294,6 +315,10 @@ void collisionx(Entity &entity) {
 		entity.collidedRight = true;
 	}
 	worldToTileCoordinates(entity.position.x + TILE_SIZE, entity.position.y + TILE_SIZE - 0.008, &gridX, &gridY);
+	if (testOutOfBounds(gridX, gridY) && entity.type == "player") {
+		state = STATE_GAME_OVER;
+		return;
+	}
 	if (!(gridX < 0 || gridX > mapWidth || gridY < 0 || gridY > mapHeight) && levelData[gridY][gridX] < 18 || (entity.type == "player" && gridY - 1 >= 0 && levelData[gridY - 1][gridX] < 18))
 	{
 		entity.position.x += 1 * (entity.position.x) - gridX * TILE_SIZE + TILE_SIZE - 0.008;
@@ -311,6 +336,10 @@ void collisiony(Entity &entity) {
 	}
 	//check bottom
 	worldToTileCoordinates(entity.position.x + 0.008, entity.position.y, &gridX, &gridY);
+	if (testOutOfBounds(gridX, gridY) && entity.type == "player") {
+		state = STATE_GAME_OVER;
+		return;
+	}
 	if (!(gridX < 0 || gridX > mapWidth || gridY < 0 || gridY > mapHeight) && levelData[gridY][gridX] < 18)
 	{
 		entity.position.y += -1 * (entity.position.y) - gridY * TILE_SIZE + 0.001;
@@ -318,6 +347,10 @@ void collisiony(Entity &entity) {
 		entity.collidedBottom = true;
 	}
 	worldToTileCoordinates(entity.position.x + TILE_SIZE - 0.008, entity.position.y, &gridX, &gridY);
+	if (testOutOfBounds(gridX, gridY) && entity.type == "player") {
+		state = STATE_GAME_OVER;
+		return;
+	}
 	if (!(gridX < 0 || gridX > mapWidth || gridY < 0 || gridY > mapHeight) && levelData[gridY][gridX] < 18)
 	{
 		entity.position.y += -1 * (entity.position.y) - gridY * TILE_SIZE + 0.001;
@@ -326,6 +359,10 @@ void collisiony(Entity &entity) {
 	}
 	//check top
 	worldToTileCoordinates(entity.position.x + 0.008, entity.position.y + TILE_SIZE + top, &gridX, &gridY);
+	if (testOutOfBounds(gridX, gridY) && entity.type == "player") {
+		state = STATE_GAME_OVER;
+		return;
+	}
 	if (!(gridX < 0 || gridX > mapWidth || gridY < 0 || gridY > mapHeight) && levelData[gridY][gridX] < 18)
 	{
 		entity.position.y += -1 * (entity.position.y + TILE_SIZE + top) - gridY * TILE_SIZE - TILE_SIZE - 0.001;
@@ -333,6 +370,10 @@ void collisiony(Entity &entity) {
 		entity.collidedTop = true;
 	}
 	worldToTileCoordinates(entity.position.x + TILE_SIZE - 0.008, entity.position.y + TILE_SIZE + top, &gridX, &gridY);
+	if (testOutOfBounds(gridX, gridY) && entity.type == "player") {
+		state = STATE_GAME_OVER;
+		return;
+	}
 	if (!(gridX < 0 || gridX > mapWidth || gridY < 0 || gridY > mapHeight) && levelData[gridY][gridX] < 18)
 	{
 		entity.position.y += -1 * (entity.position.y + TILE_SIZE + top) - gridY * TILE_SIZE - TILE_SIZE - 0.001;
@@ -341,7 +382,7 @@ void collisiony(Entity &entity) {
 	}
 }
 
-bool entityCollision(Entity e1, Entity e2) {
+bool entityCollision(Entity &e1, Entity &e2) {
 	int top = 0;
 	if (e1.type == "player") {
 		top = TILE_SIZE;
@@ -356,7 +397,6 @@ bool entityCollision(Entity e1, Entity e2) {
 float distance(double x1, double y1, double x2, double y2) {
 	return sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
 }
-
 
 #define FIXED_TIMESTEP 0.0166666f
 #define MAX_TIMESTEPS 6
@@ -402,9 +442,6 @@ Matrix viewMatrix;
 
 enum letterIndex { A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z };
 int LETTER_SHIFT = 65;
-
-enum GameState { STATE_MAIN_MENU, STATE_CONTROLS, STATE_GAME_LEVEL, STATE_GAME_OVER };
-int state = STATE_MAIN_MENU;
 
 SDL_Event event;
 bool done = false;
@@ -521,6 +558,24 @@ void controls(ShaderProgram &program, GLuint &controlsPage) {
 	SDL_GL_SwapWindow(displayWindow);
 }
 
+void new_game(ShaderProgram &program, const std::string &level) {
+	std::ifstream world(level);
+	std::string line;
+	while (getline(world, line)) {
+		if (line == "[header]") {
+			if (!readHeader(world)) {
+				return;
+			}
+		}
+		else if (line == "[layer]") {
+			readLayerData(world);
+		}
+		else if (line == "[objectLayer]") {
+			readEntityData(world);
+		}
+	}
+}
+
 void game_over(ShaderProgram &program, GLuint &gameOverPage, GLuint &letters) {
 
 	int playAgainArr[] = { P, L, A, Y, -1, A, G, A, I, N };
@@ -538,6 +593,7 @@ void game_over(ShaderProgram &program, GLuint &gameOverPage, GLuint &letters) {
 			float units_y = (((float)(720 - event.motion.y) / 720) * 4.0f) - 2.0f;
 
 			if (units_x > -1.0f && units_x < 1.0f && units_y > -0.9f && units_y < -0.7f) {
+				new_game(program, "world1.txt");
 				state = STATE_GAME_LEVEL;
 			}
 
@@ -549,6 +605,8 @@ void game_over(ShaderProgram &program, GLuint &gameOverPage, GLuint &letters) {
 
 	glClear(GL_COLOR_BUFFER_BIT);
 
+	viewMatrix.identity();
+	modelMatrix.identity();
 	// Draw background image
 	program.setModelMatrix(modelMatrix);
 	program.setProjectionMatrix(projectionMatrix);
@@ -599,6 +657,18 @@ void game_over(ShaderProgram &program, GLuint &gameOverPage, GLuint &letters) {
 	SDL_GL_SwapWindow(displayWindow);
 }
 
+void level_clear() {
+	//empty the level
+	/*levelData = new unsigned char*[mapHeight];
+	for (int i = 0; i < mapHeight; ++i) {
+	levelData[i] = new unsigned char[mapWidth];*/
+	entities.clear();
+	for (int i = 0; i < mapHeight; ++i) {
+		delete[] levelData[i];
+	}
+	delete[] levelData;
+}
+
 int main(int argc, char *argv[])
 {
 	SDL_Init(SDL_INIT_VIDEO);
@@ -620,22 +690,23 @@ int main(int argc, char *argv[])
 	GLuint letters = LoadTexture("letters.png");
 	GLuint goldenGearSpriteSheet = LoadTexture("golden_gear_spritesheet.png");
 	//GLuint spriteSheet = LoadTexture("spritesheet.png");
-
-	std::ifstream infile("world1.txt");
+	/*
+	std::ifstream world1("world1.txt");
 	std::string line;
-	while (getline(infile, line)) {
+	while (getline(world1, line)) {
 		if (line == "[header]") {
-			if (!readHeader(infile)) {
+			if (!readHeader(world1)) {
 				return 0;
 			}
 		}
 		else if (line == "[layer]") {
-			readLayerData(infile);
+			readLayerData(world1);
 		}
 		else if (line == "[objectLayer]") {
-			readEntityData(infile);
+			readEntityData(world1);
 		}
-	}
+	}*/
+	new_game(program, "world1.txt");
 
 	projectionMatrix.setOrthoProjection(-3.55, 3.55, -2.0f, 2.0f, -1.0f, 1.0f);
 	glUseProgram(program.programID);
@@ -652,12 +723,13 @@ int main(int argc, char *argv[])
 			break;
 
 		case STATE_CONTROLS:
-			//controls(program, controlsPage);
-			game_over(program, gameOverPage, letters);
+			controls(program, controlsPage);
+			//game_over(program, gameOverPage, letters);
 			break;
 
 		case STATE_GAME_OVER:
 			game_over(program, gameOverPage, letters);
+			break;
 
 		case STATE_GAME_LEVEL:
 			p1ax = 0;
@@ -716,8 +788,18 @@ int main(int argc, char *argv[])
 				if (entities[i].type == "player") {
 					for (int j = 0; j < entities.size(); ++j) {
 						if (entities[j].type == "gear" && entityCollision(entities[i], entities[j])) {
-							//entities.erase(entities.begin() + j);
 							entities[j].exists = false;
+							//gearcount++;
+							break;
+						}
+						else if (entities[j].type == "silverGear" && entityCollision(entities[i], entities[j])) {
+							entities[j].exists = false;
+							//gearcount += 10;
+							break;
+						}
+						else if (entities[j].type == "crab" && entityCollision(entities[i], entities[j])) {
+							//entities[j].exists = false;
+							state = STATE_GAME_OVER;
 							break;
 						}
 					}
@@ -824,6 +906,8 @@ int main(int argc, char *argv[])
 				}
 			}			
 			SDL_GL_SwapWindow(displayWindow);
+			if (state == STATE_GAME_OVER)
+				level_clear();
 			break;
 		}
 	}
