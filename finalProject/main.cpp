@@ -408,7 +408,7 @@ void Update(float p1ax, float p1vy, float ticks, float time) {
 				entities[i].velocity.y = p1vy;
 			}
 		}
-		else if (entities[i].type == "gear") {
+		else if (entities[i].type == "gear" || entities[i].type == "silverGear") {
 			entities[i].position.y += 0.001 * sin(ticks * 10 / PI);
 		}
 		if (!entities[i].isStatic) {
@@ -711,8 +711,12 @@ int main(int argc, char *argv[])
 	projectionMatrix.setOrthoProjection(-3.55, 3.55, -2.0f, 2.0f, -1.0f, 1.0f);
 	glUseProgram(program.programID);
 
-	float p1vy = 0;
+	float p1vy = 0.0f;
 	float p1ax = 0.0f;
+	float units_x = 0.0f;
+	float units_y = 0.0f;
+	float units_mx = 0.0f;
+	float units_my = 0.0f;
 
 	//int gearCount = 0; // ----------------------------------------
 	int gearCountArr[] = { NUM_SHIFT, NUM_SHIFT, NUM_SHIFT };
@@ -757,6 +761,10 @@ int main(int argc, char *argv[])
 						p1vy = 0;
 					}
 				}
+				else if (event.type == SDL_MOUSEMOTION) {
+					units_x = (((float)event.motion.x / 1280) * 7.1f) - 3.55f;
+					units_y = (((float)(720 - event.motion.y) / 720) * 4.0f) - 2.0f;
+				}
 				if (event.type == SDL_MOUSEBUTTONDOWN) {
 					if (event.button.button == 1) {
 						
@@ -785,6 +793,8 @@ int main(int argc, char *argv[])
 				Update(p1ax, p1vy, ticks, FIXED_TIMESTEP);
 			}
 			Update(p1ax, p1vy, ticks, fixedElapsed);
+			units_mx = units_x + entities[pIndex].position.x + TILE_SIZE / 2;
+			units_my = units_y + entities[pIndex].position.y + mapHeight*TILE_SIZE + TILE_SIZE / 2;
 
 			////////ENTITY COLLISION//////////////////////////////////////////////////////////////////////////
 			for (int i = 0; i < entities.size(); ++i) {
@@ -833,9 +843,7 @@ int main(int argc, char *argv[])
 					
 					int mx, my;
 
-					float units_x = (((float)event.motion.x / 1280) * 7.1f) - 3.55f + entities[pIndex].position.x + TILE_SIZE / 2;
-					float units_y = (((float)(720 - event.motion.y) / 720) * 4.0f) - 2.0f + entities[pIndex].position.y + mapHeight*TILE_SIZE + TILE_SIZE / 2;
-					worldToTileCoordinates(units_x, units_y, &mx, &my);
+					worldToTileCoordinates(units_mx, units_my, &mx, &my);
 					my = my + mapHeight - 1;
 
 					if (levelData[y][x] >= 9 && levelData[y][x] <= 12 && distance(mx, my, x, y) < minDist) {
@@ -859,6 +867,7 @@ int main(int argc, char *argv[])
 			if (minx >= 0 && miny >= 0) {
 				modelMatrix.identity();
 				modelMatrix.Translate(minx*TILE_SIZE, (mapHeight - miny - 1)*TILE_SIZE, 0);
+				modelMatrix.Rotate(-5 * ticks);
 				program.setModelMatrix(modelMatrix);
 				program.setProjectionMatrix(projectionMatrix);
 				program.setViewMatrix(viewMatrix);
