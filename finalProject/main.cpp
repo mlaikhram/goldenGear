@@ -445,9 +445,13 @@ int main(int argc, char *argv[])
 	float espurrx = 0;
 	float espurrSpeed = 0.05;
 	int inactiveBullet = 6; //current inactive bullet index
-	enum GameState { STATE_MAIN_MENU, STATE_GAME_LEVEL };
+	enum GameState { STATE_MAIN_MENU, STATE_CONTROLS, STATE_GAME_LEVEL };
 	int state = STATE_MAIN_MENU;
 	float p1ax = 0.0f;
+
+	float vertices[] = { -2.5, -2.5, 2.5, -2.5, 2.5, 2.5, -2.5, -2.5, 2.5, 2.5, -2.5, 2.5 };
+	float texCoords[] = { 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0 };
+	GLuint controlsPage = LoadTexture("controls.png");
 
 	SDL_Event event;
 	bool done = false;
@@ -472,7 +476,7 @@ int main(int argc, char *argv[])
 					}
 
 					if (units_x > -2.1f && units_x < -0.6f && units_y > -0.6f && units_y < -0.4f) {
-						//state = STATE_CONTROLS;
+						state = STATE_CONTROLS;
 						//state = STATE_GAME_LEVEL;
 					}
 
@@ -516,6 +520,33 @@ int main(int argc, char *argv[])
 					DrawSpriteSheetSprite(&program, exit[i] + LETTER_SHIFT, 16, 16, letters);
 				}
 			}
+
+			SDL_GL_SwapWindow(displayWindow);
+			break;
+
+		case STATE_CONTROLS:
+			glClear(GL_COLOR_BUFFER_BIT);
+
+			program.setModelMatrix(modelMatrix);
+			program.setProjectionMatrix(projectionMatrix);
+			program.setViewMatrix(viewMatrix);
+
+			//GLuint controls = LoadTexture("controls.png");
+
+			glBindTexture(GL_TEXTURE_2D, controlsPage);
+
+			//float vertices[] = { -2.5, -2.5, 2.5, -2.5, 2.5, 2.5, -2.5, -2.5, 2.5, 2.5, -2.5, 2.5 };
+			glVertexAttribPointer(program.positionAttribute, 2, GL_FLOAT, false, 0, vertices);
+			glEnableVertexAttribArray(program.positionAttribute);
+
+			//float texCoords[] = { 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0 };
+			glVertexAttribPointer(program.texCoordAttribute, 2, GL_FLOAT, false, 0, texCoords);
+			glEnableVertexAttribArray(program.texCoordAttribute);
+
+			glDrawArrays(GL_TRIANGLES, 0, 6);
+
+			glDisableVertexAttribArray(program.positionAttribute);
+			glDisableVertexAttribArray(program.texCoordAttribute);
 
 			SDL_GL_SwapWindow(displayWindow);
 			break;

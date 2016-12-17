@@ -89,6 +89,7 @@
     <None Include="vertex.glsl" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="controls.png" />
     <Image Include="golden_gear_spritesheet.png" />
     <Image Include="letters.png" />
   </ItemGroup>
