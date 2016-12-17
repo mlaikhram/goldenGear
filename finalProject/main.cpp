@@ -11,6 +11,7 @@
 #include <string>
 #include <iostream>
 #include <sstream>
+#include <cmath>
 
 #ifdef _WINDOWS
 #define RESOURCE_FOLDER ""
@@ -217,13 +218,17 @@ int pIndex;
 
 void placeEntity(std::string type, float x, float y) {
 	bool isStatic = true;
+	float ax = 0;
 	if (type == "player" || type == "crab") {
 		isStatic = false;
 	}
 	if (type == "player") {
 		pIndex = entities.size();
 	}
-	Entity entity(type, isStatic, Vector3(x, y, 0));
+	if (type == "crab") {
+		ax = -.5;
+	}
+	Entity entity(type, isStatic, Vector3(x, y, 0), Vector3(0, 0, 0), Vector3(ax, 0, 0));
 	entities.push_back(entity);
 }
 
@@ -273,57 +278,66 @@ bool testOutOfBounds(int gridX, int gridY) {
 	return false;
 }
 
+void handleOOB(Entity &entity) {
+	if (entity.type == "player") {
+		state = STATE_GAME_OVER;
+	}
+	else {
+		entity.exists = false;
+	}
+}
+
 void collisionx(Entity &entity) {
 	int gridX, gridY;
 
 	//check left
 	worldToTileCoordinates(entity.position.x, entity.position.y + 0.008, &gridX, &gridY);
-	if (testOutOfBounds(gridX, gridY) && entity.type == "player") {
-		state = STATE_GAME_OVER;
+	if (testOutOfBounds(gridX, gridY)) {
+		handleOOB(entity);
 		return;
 	}
 	if (!(gridX < 0 || gridX > mapWidth || gridY < 0 || gridY > mapHeight) && levelData[gridY][gridX] < 18 || (entity.type == "player" && gridY - 1 >= 0 && levelData[gridY - 1][gridX] < 18))
 	{
 		entity.position.x += 1 * (entity.position.x) - gridX * TILE_SIZE - TILE_SIZE + 0.008;
 		entity.velocity.x = 0;
-		entity.acceleration.x = 0;
+		//entity.acceleration.x = 0;
 		entity.collidedLeft = true;
 	}
 	worldToTileCoordinates(entity.position.x, entity.position.y + TILE_SIZE - 0.008, &gridX, &gridY);
-	if (testOutOfBounds(gridX, gridY) && entity.type == "player") {
-		state = STATE_GAME_OVER;
+	if (testOutOfBounds(gridX, gridY)) {
+		handleOOB(entity);
 		return;
 	}
 	if (!(gridX < 0 || gridX > mapWidth || gridY < 0 || gridY > mapHeight) && levelData[gridY][gridX] < 18 || (entity.type == "player" && gridY - 1 >= 0 && levelData[gridY - 1][gridX] < 18))
 	{
 		entity.position.x += 1 * (entity.position.x) - gridX * TILE_SIZE - TILE_SIZE + 0.008;
 		entity.velocity.x = 0;
-		entity.acceleration.x = 0;
+		//entity.acceleration.x = 0;
 		entity.collidedLeft = true;
 	}
 	//check right
 	worldToTileCoordinates(entity.position.x + TILE_SIZE, entity.position.y + 0.008, &gridX, &gridY);
-	if (testOutOfBounds(gridX, gridY) && entity.type == "player") {
-		state = STATE_GAME_OVER;
+	if (testOutOfBounds(gridX, gridY)) {
+		handleOOB(entity);
 		return;
 	}
 	if (!(gridX < 0 || gridX > mapWidth || gridY < 0 || gridY > mapHeight) && levelData[gridY][gridX] < 18 || (entity.type == "player" && gridY - 1 >= 0 && levelData[gridY - 1][gridX] < 18))
 	{
 		entity.position.x += 1 * (entity.position.x) - gridX * TILE_SIZE + TILE_SIZE - 0.008;
 		entity.velocity.x = 0;
-		entity.acceleration.x = 0;
+		//entity.acceleration.x = 0;
 		entity.collidedRight = true;
 	}
 	worldToTileCoordinates(entity.position.x + TILE_SIZE, entity.position.y + TILE_SIZE - 0.008, &gridX, &gridY);
-	if (testOutOfBounds(gridX, gridY) && entity.type == "player") {
-		state = STATE_GAME_OVER;
+	if (testOutOfBounds(gridX, gridY)) {
+		handleOOB(entity);
 		return;
 	}
 	if (!(gridX < 0 || gridX > mapWidth || gridY < 0 || gridY > mapHeight) && levelData[gridY][gridX] < 18 || (entity.type == "player" && gridY - 1 >= 0 && levelData[gridY - 1][gridX] < 18))
 	{
 		entity.position.x += 1 * (entity.position.x) - gridX * TILE_SIZE + TILE_SIZE - 0.008;
 		entity.velocity.x = 0;
-		entity.acceleration.x = 0;
+		//entity.acceleration.x = 0;
 		entity.collidedRight = true;
 	}
 }
@@ -336,8 +350,8 @@ void collisiony(Entity &entity) {
 	}
 	//check bottom
 	worldToTileCoordinates(entity.position.x + 0.008, entity.position.y, &gridX, &gridY);
-	if (testOutOfBounds(gridX, gridY) && entity.type == "player") {
-		state = STATE_GAME_OVER;
+	if (testOutOfBounds(gridX, gridY)) {
+		handleOOB(entity);
 		return;
 	}
 	if (!(gridX < 0 || gridX > mapWidth || gridY < 0 || gridY > mapHeight) && levelData[gridY][gridX] < 18)
@@ -347,8 +361,8 @@ void collisiony(Entity &entity) {
 		entity.collidedBottom = true;
 	}
 	worldToTileCoordinates(entity.position.x + TILE_SIZE - 0.008, entity.position.y, &gridX, &gridY);
-	if (testOutOfBounds(gridX, gridY) && entity.type == "player") {
-		state = STATE_GAME_OVER;
+	if (testOutOfBounds(gridX, gridY)) {
+		handleOOB(entity);
 		return;
 	}
 	if (!(gridX < 0 || gridX > mapWidth || gridY < 0 || gridY > mapHeight) && levelData[gridY][gridX] < 18)
@@ -359,8 +373,8 @@ void collisiony(Entity &entity) {
 	}
 	//check top
 	worldToTileCoordinates(entity.position.x + 0.008, entity.position.y + TILE_SIZE + top, &gridX, &gridY);
-	if (testOutOfBounds(gridX, gridY) && entity.type == "player") {
-		state = STATE_GAME_OVER;
+	if (testOutOfBounds(gridX, gridY)) {
+		handleOOB(entity);
 		return;
 	}
 	if (!(gridX < 0 || gridX > mapWidth || gridY < 0 || gridY > mapHeight) && levelData[gridY][gridX] < 18)
@@ -370,8 +384,8 @@ void collisiony(Entity &entity) {
 		entity.collidedTop = true;
 	}
 	worldToTileCoordinates(entity.position.x + TILE_SIZE - 0.008, entity.position.y + TILE_SIZE + top, &gridX, &gridY);
-	if (testOutOfBounds(gridX, gridY) && entity.type == "player") {
-		state = STATE_GAME_OVER;
+	if (testOutOfBounds(gridX, gridY)) {
+		handleOOB(entity);
 		return;
 	}
 	if (!(gridX < 0 || gridX > mapWidth || gridY < 0 || gridY > mapHeight) && levelData[gridY][gridX] < 18)
@@ -407,9 +421,16 @@ void Update(float p1ax, float p1vy, float ticks, float time) {
 			if (entities[i].collidedBottom) {
 				entities[i].velocity.y = p1vy;
 			}
+			if (entities[i].collidedLeft || entities[i].collidedRight) {
+				entities[i].acceleration.x = 0;
+			}
 		}
 		else if (entities[i].type == "gear" || entities[i].type == "silverGear") {
 			entities[i].position.y += 0.001 * sin(ticks * 10 / PI);
+		}
+		else if (entities[i].type == "crab" && (entities[i].collidedLeft || entities[i].collidedRight)) {
+			entities[i].acceleration.x *= -1.0;
+			entities[i].velocity.y = 1.0;
 		}
 		if (!entities[i].isStatic) {
 			entities[i].acceleration.y = -5;
