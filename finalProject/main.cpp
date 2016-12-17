@@ -387,6 +387,7 @@ void Update(float p1ax, float p1vy, float ticks, float time) {
 }
 
 
+
 int main(int argc, char *argv[])
 {
 	SDL_Init(SDL_INIT_VIDEO);
@@ -409,7 +410,10 @@ int main(int argc, char *argv[])
 	GLuint goldenGearSpriteSheet = LoadTexture("golden_gear_spritesheet.png");
 	enum letterIndex { A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z };
 	int LETTER_SHIFT = 65;
-	int message[] = { P, R, E, S, S, -1, S, P, A, C, E, -1, T, O, -1, B, E, G, I, N };
+	//int message[] = { P, R, E, S, S, -1, S, P, A, C, E, -1, T, O, -1, B, E, G, I, N };
+	int playGame[] = { P, L, A, Y, -1, G, A, M, E};
+	int controls[] = { C, O, N, T, R, O, L, S };
+	int exit[] = { E, X, I, T };
 
 	std::ifstream infile("world1.txt");
 	std::string line;
@@ -456,24 +460,63 @@ int main(int argc, char *argv[])
 				if (event.type == SDL_QUIT || event.type == SDL_WINDOWEVENT_CLOSE) {
 					done = true;
 				}
-				else if (event.type == SDL_KEYDOWN) {
-					if (event.key.keysym.scancode == SDL_SCANCODE_SPACE) {
+				else if (event.type == SDL_MOUSEBUTTONDOWN) { // MOUSEBUTTONDOWN
+					// Convert from pixels to OpenGL units
+					// units_x = (pixel_x / x_resolution) * ortho_width ) - ortho_width / 2.0;
+					float units_x = (((float)event.motion.x / 1280) * 7.1f) - 3.55f;
+					// units_y = ((y_resolution - pixel_y) / y_resolution) * ortho_height) - ortho_height / 2.0;
+					float units_y = (((float)(720 - event.motion.y) / 720) * 4.0f) - 2.0f;
+
+					if (units_x > -2.1f && units_x < -0.4f && units_y > -0.1f && units_y < 0.1f) {
 						state = STATE_GAME_LEVEL;
+					}
+
+					if (units_x > -2.1f && units_x < -0.6f && units_y > -0.6f && units_y < -0.4f) {
+						//state = STATE_CONTROLS;
+						//state = STATE_GAME_LEVEL;
+					}
+
+					if (units_x > -2.1f && units_x < -1.4f && units_y > -1.1f && units_y < -0.9f) {
+						SDL_Quit();
+						return 0;
 					}
 				}
 			}
 			glClear(GL_COLOR_BUFFER_BIT);
 			
-			for (int i = 0; i < 20; ++i) {
-				if (message[i] != -1) {
+			for (int i = 0; i < 9; ++i) { // Length of playGame
+				if (playGame[i] != -1) {
 					modelMatrix.identity();
 					modelMatrix.Translate(-3.45 + i*.2 + 1.4, 0, 0);
 					program.setModelMatrix(modelMatrix);
 					program.setProjectionMatrix(projectionMatrix);
 					program.setViewMatrix(viewMatrix);
-					DrawSpriteSheetSprite(&program, message[i] + 65, 16, 16, letters);
+					DrawSpriteSheetSprite(&program, playGame[i] + LETTER_SHIFT, 16, 16, letters);
 				}
 			}
+
+			for (int i = 0; i < 8; ++i) { // Length of controls
+				if (controls[i] != -1) {
+					modelMatrix.identity();
+					modelMatrix.Translate(-3.45 + i*.2 + 1.4, -0.5, 0);
+					program.setModelMatrix(modelMatrix);
+					program.setProjectionMatrix(projectionMatrix);
+					program.setViewMatrix(viewMatrix);
+					DrawSpriteSheetSprite(&program, controls[i] + LETTER_SHIFT, 16, 16, letters);
+				}
+			}
+
+			for (int i = 0; i < 4; ++i) { // Length of exit
+				if (exit[i] != -1) {
+					modelMatrix.identity();
+					modelMatrix.Translate(-3.45 + i*.2 + 1.4, -1, 0);
+					program.setModelMatrix(modelMatrix);
+					program.setProjectionMatrix(projectionMatrix);
+					program.setViewMatrix(viewMatrix);
+					DrawSpriteSheetSprite(&program, exit[i] + LETTER_SHIFT, 16, 16, letters);
+				}
+			}
+
 			SDL_GL_SwapWindow(displayWindow);
 			break;
 
