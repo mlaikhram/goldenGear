@@ -90,6 +90,7 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="controls.png" />
+    <Image Include="game_over.png" />
     <Image Include="golden_gear_spritesheet.png" />
     <Image Include="letters.png" />
   </ItemGroup>

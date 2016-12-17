@@ -403,7 +403,7 @@ Matrix viewMatrix;
 enum letterIndex { A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z };
 int LETTER_SHIFT = 65;
 
-enum GameState { STATE_MAIN_MENU, STATE_CONTROLS, STATE_GAME_LEVEL };
+enum GameState { STATE_MAIN_MENU, STATE_CONTROLS, STATE_GAME_LEVEL, STATE_GAME_OVER };
 int state = STATE_MAIN_MENU;
 
 SDL_Event event;
@@ -444,7 +444,7 @@ void main_menu(ShaderProgram &program, GLuint &letters) {
 	}
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	for (int i = 0; i < 9; ++i) { // Length of playGame
+	for (int i = 0; i < 9; ++i) { // Length of playGameArr
 		if (playGameArr[i] != -1) {
 			modelMatrix.identity();
 			modelMatrix.Translate(-3.45 + i*.2 + 1.4, 0, 0);
@@ -455,7 +455,7 @@ void main_menu(ShaderProgram &program, GLuint &letters) {
 		}
 	}
 
-	for (int i = 0; i < 8; ++i) { // Length of controls
+	for (int i = 0; i < 8; ++i) { // Length of controlsArr
 		if (controlsArr[i] != -1) {
 			modelMatrix.identity();
 			modelMatrix.Translate(-3.45 + i*.2 + 1.4, -0.5, 0);
@@ -466,7 +466,7 @@ void main_menu(ShaderProgram &program, GLuint &letters) {
 		}
 	}
 
-	for (int i = 0; i < 4; ++i) { // Length of exit
+	for (int i = 0; i < 4; ++i) { // Length of exitArr
 		if (exitArr[i] != -1) {
 			modelMatrix.identity();
 			modelMatrix.Translate(-3.45 + i*.2 + 1.4, -1, 0);
@@ -495,9 +495,6 @@ void controls(ShaderProgram &program, GLuint &controlsPage) {
 
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	float vertices[] = { -3.55, -2.0, 3.55, -2.0, 3.55, 2.0, -3.55, -2.0, 3.55, 2.0, -3.55, 2.0 };
-	float texCoords[] = { 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0 };
-
 	program.setModelMatrix(modelMatrix);
 	program.setProjectionMatrix(projectionMatrix);
 	program.setViewMatrix(viewMatrix);
@@ -508,11 +505,11 @@ void controls(ShaderProgram &program, GLuint &controlsPage) {
 
 	glBindTexture(GL_TEXTURE_2D, controlsPage);
 
-	//float vertices[] = { -2.5, -2.5, 2.5, -2.5, 2.5, 2.5, -2.5, -2.5, 2.5, 2.5, -2.5, 2.5 };
+	float vertices[] = { -3.55, -2.0, 3.55, -2.0, 3.55, 2.0, -3.55, -2.0, 3.55, 2.0, -3.55, 2.0 };
 	glVertexAttribPointer(program.positionAttribute, 2, GL_FLOAT, false, 0, vertices);
 	glEnableVertexAttribArray(program.positionAttribute);
 
-	//float texCoords[] = { 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0 };
+	float texCoords[] = { 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0 };
 	glVertexAttribPointer(program.texCoordAttribute, 2, GL_FLOAT, false, 0, texCoords);
 	glEnableVertexAttribArray(program.texCoordAttribute);
 
@@ -520,6 +517,84 @@ void controls(ShaderProgram &program, GLuint &controlsPage) {
 
 	glDisableVertexAttribArray(program.positionAttribute);
 	glDisableVertexAttribArray(program.texCoordAttribute);
+
+	SDL_GL_SwapWindow(displayWindow);
+}
+
+void game_over(ShaderProgram &program, GLuint &gameOverPage, GLuint &letters) {
+
+	int playAgainArr[] = { P, L, A, Y, -1, A, G, A, I, N };
+	int exitArr[] = { E, X, I, T };
+
+	while (SDL_PollEvent(&event)) {
+		if (event.type == SDL_QUIT || event.type == SDL_WINDOWEVENT_CLOSE) {
+			done = true;
+		}
+		else if (event.type == SDL_MOUSEBUTTONDOWN) { // MOUSEBUTTONDOWN
+												  // Convert from pixels to OpenGL units
+												  // units_x = (pixel_x / x_resolution) * ortho_width ) - ortho_width / 2.0;
+			float units_x = (((float)event.motion.x / 1280) * 7.1f) - 3.55f;
+			// units_y = ((y_resolution - pixel_y) / y_resolution) * ortho_height) - ortho_height / 2.0;
+			float units_y = (((float)(720 - event.motion.y) / 720) * 4.0f) - 2.0f;
+
+			if (units_x > -1.0f && units_x < 1.0f && units_y > -0.9f && units_y < -0.7f) {
+				state = STATE_GAME_LEVEL;
+			}
+
+			if (units_x > -0.4f && units_x < 0.3f && units_y > -1.4f && units_y < -1.2f) {
+				done = true;
+			}
+		}
+	}
+
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	// Draw background image
+	program.setModelMatrix(modelMatrix);
+	program.setProjectionMatrix(projectionMatrix);
+	program.setViewMatrix(viewMatrix);
+
+	//GLuint gameOverPage = LoadTexture("game_over.png");
+
+	glBindTexture(GL_TEXTURE_2D, gameOverPage);
+
+	float vertices[] = { -3.55, -2.0, 3.55, -2.0, 3.55, 2.0, -3.55, -2.0, 3.55, 2.0, -3.55, 2.0 };
+	glVertexAttribPointer(program.positionAttribute, 2, GL_FLOAT, false, 0, vertices);
+	glEnableVertexAttribArray(program.positionAttribute);
+
+	float texCoords[] = { 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0 };
+	glVertexAttribPointer(program.texCoordAttribute, 2, GL_FLOAT, false, 0, texCoords);
+	glEnableVertexAttribArray(program.texCoordAttribute);
+
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+
+	glDisableVertexAttribArray(program.positionAttribute);
+	glDisableVertexAttribArray(program.texCoordAttribute);
+
+	// Draw playGame and exit buttons
+	for (int i = 0; i < 10; ++i) { // Length of playAgainArr
+		if (playAgainArr[i] != -1) {
+			modelMatrix.identity();
+			modelMatrix.Translate(-0.9 + i*.2, -0.8, 0);
+			program.setModelMatrix(modelMatrix);
+			program.setProjectionMatrix(projectionMatrix);
+			program.setViewMatrix(viewMatrix);
+			DrawSpriteSheetSprite(&program, playAgainArr[i] + LETTER_SHIFT, 16, 16, letters);
+		}
+	}
+
+	for (int i = 0; i < 4; ++i) { // Length of exitArr
+		if (exitArr[i] != -1) {
+			modelMatrix.identity();
+			modelMatrix.Translate(-0.3 + i*.2, -1.3, 0);
+			program.setModelMatrix(modelMatrix);
+			program.setProjectionMatrix(projectionMatrix);
+			program.setViewMatrix(viewMatrix);
+			DrawSpriteSheetSprite(&program, exitArr[i] + LETTER_SHIFT, 16, 16, letters);
+		}
+	}
+
+	modelMatrix.identity();
 
 	SDL_GL_SwapWindow(displayWindow);
 }
@@ -541,6 +616,7 @@ int main(int argc, char *argv[])
 	float lastFrameTicks = 0.0f;
 	
 	GLuint controlsPage = LoadTexture("controls.png");
+	GLuint gameOverPage = LoadTexture("game_over.png");
 	GLuint letters = LoadTexture("letters.png");
 	GLuint goldenGearSpriteSheet = LoadTexture("golden_gear_spritesheet.png");
 	//GLuint spriteSheet = LoadTexture("spritesheet.png");
@@ -576,8 +652,12 @@ int main(int argc, char *argv[])
 			break;
 
 		case STATE_CONTROLS:
-			controls(program, controlsPage);
+			//controls(program, controlsPage);
+			game_over(program, gameOverPage, letters);
 			break;
+
+		case STATE_GAME_OVER:
+			game_over(program, gameOverPage, letters);
 
 		case STATE_GAME_LEVEL:
 			p1ax = 0;
