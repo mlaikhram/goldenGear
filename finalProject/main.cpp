@@ -449,7 +449,8 @@ int main(int argc, char *argv[])
 	int state = STATE_MAIN_MENU;
 	float p1ax = 0.0f;
 
-	float vertices[] = { -2.5, -2.5, 2.5, -2.5, 2.5, 2.5, -2.5, -2.5, 2.5, 2.5, -2.5, 2.5 };
+	//float vertices[] = { -2.5, -2.5, 2.5, -2.5, 2.5, 2.5, -2.5, -2.5, 2.5, 2.5, -2.5, 2.5 };
+	float vertices[] = { -3.55, -2.0, 3.55, -2.0, 3.55, 2.0, -3.55, -2.0, 3.55, 2.0, -3.55, 2.0 };
 	float texCoords[] = { 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0 };
 	GLuint controlsPage = LoadTexture("controls.png");
 
@@ -525,11 +526,24 @@ int main(int argc, char *argv[])
 			break;
 
 		case STATE_CONTROLS:
+			while (SDL_PollEvent(&event)) {
+				if (event.type == SDL_QUIT || event.type == SDL_WINDOWEVENT_CLOSE) {
+					done = true;
+				}
+				else if (event.type == SDL_KEYDOWN) {
+					if (event.key.keysym.scancode == SDL_SCANCODE_ESCAPE) {
+						state = STATE_MAIN_MENU;
+					}
+				}
+			}
+
 			glClear(GL_COLOR_BUFFER_BIT);
 
 			program.setModelMatrix(modelMatrix);
 			program.setProjectionMatrix(projectionMatrix);
 			program.setViewMatrix(viewMatrix);
+
+			modelMatrix.identity();
 
 			//GLuint controls = LoadTexture("controls.png");
 
