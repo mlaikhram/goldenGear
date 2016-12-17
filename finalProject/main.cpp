@@ -396,7 +396,136 @@ void Update(float p1ax, float p1vy, float ticks, float time) {
 	}
 }
 
+Matrix projectionMatrix;
+Matrix modelMatrix;
+Matrix viewMatrix;
 
+enum letterIndex { A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z };
+int LETTER_SHIFT = 65;
+
+enum GameState { STATE_MAIN_MENU, STATE_CONTROLS, STATE_GAME_LEVEL };
+int state = STATE_MAIN_MENU;
+
+SDL_Event event;
+bool done = false;
+
+void main_menu(ShaderProgram &program) {
+
+	GLuint letters = LoadTexture("letters.png");
+
+	int playGameArr[] = { P, L, A, Y, -1, G, A, M, E };
+	int controlsArr[] = { C, O, N, T, R, O, L, S };
+	int exitArr[] = { E, X, I, T };
+
+	while (SDL_PollEvent(&event)) {
+		if (event.type == SDL_QUIT || event.type == SDL_WINDOWEVENT_CLOSE) {
+			done = true;
+		}
+		else if (event.type == SDL_MOUSEBUTTONDOWN) { // MOUSEBUTTONDOWN
+													  // Convert from pixels to OpenGL units
+													  // units_x = (pixel_x / x_resolution) * ortho_width ) - ortho_width / 2.0;
+			float units_x = (((float)event.motion.x / 1280) * 7.1f) - 3.55f;
+			// units_y = ((y_resolution - pixel_y) / y_resolution) * ortho_height) - ortho_height / 2.0;
+			float units_y = (((float)(720 - event.motion.y) / 720) * 4.0f) - 2.0f;
+
+			if (units_x > -2.1f && units_x < -0.4f && units_y > -0.1f && units_y < 0.1f) {
+				state = STATE_GAME_LEVEL;
+			}
+
+			if (units_x > -2.1f && units_x < -0.6f && units_y > -0.6f && units_y < -0.4f) {
+				state = STATE_CONTROLS;
+				//state = STATE_GAME_LEVEL;
+			}
+
+			if (units_x > -2.1f && units_x < -1.4f && units_y > -1.1f && units_y < -0.9f) {
+				/*SDL_Quit();
+				return 0;*/
+				done = true;
+			}
+		}
+	}
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	for (int i = 0; i < 9; ++i) { // Length of playGame
+		if (playGameArr[i] != -1) {
+			modelMatrix.identity();
+			modelMatrix.Translate(-3.45 + i*.2 + 1.4, 0, 0);
+			program.setModelMatrix(modelMatrix);
+			program.setProjectionMatrix(projectionMatrix);
+			program.setViewMatrix(viewMatrix);
+			DrawSpriteSheetSprite(&program, playGameArr[i] + LETTER_SHIFT, 16, 16, letters);
+		}
+	}
+
+	for (int i = 0; i < 8; ++i) { // Length of controls
+		if (controlsArr[i] != -1) {
+			modelMatrix.identity();
+			modelMatrix.Translate(-3.45 + i*.2 + 1.4, -0.5, 0);
+			program.setModelMatrix(modelMatrix);
+			program.setProjectionMatrix(projectionMatrix);
+			program.setViewMatrix(viewMatrix);
+			DrawSpriteSheetSprite(&program, controlsArr[i] + LETTER_SHIFT, 16, 16, letters);
+		}
+	}
+
+	for (int i = 0; i < 4; ++i) { // Length of exit
+		if (exitArr[i] != -1) {
+			modelMatrix.identity();
+			modelMatrix.Translate(-3.45 + i*.2 + 1.4, -1, 0);
+			program.setModelMatrix(modelMatrix);
+			program.setProjectionMatrix(projectionMatrix);
+			program.setViewMatrix(viewMatrix);
+			DrawSpriteSheetSprite(&program, exitArr[i] + LETTER_SHIFT, 16, 16, letters);
+		}
+	}
+
+	SDL_GL_SwapWindow(displayWindow);
+}
+
+void controls(ShaderProgram &program) {
+
+	while (SDL_PollEvent(&event)) {
+		if (event.type == SDL_QUIT || event.type == SDL_WINDOWEVENT_CLOSE) {
+			done = true;
+		}
+		else if (event.type == SDL_KEYDOWN) {
+			if (event.key.keysym.scancode == SDL_SCANCODE_ESCAPE) {
+				state = STATE_MAIN_MENU;
+			}
+		}
+	}
+
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	float vertices[] = { -3.55, -2.0, 3.55, -2.0, 3.55, 2.0, -3.55, -2.0, 3.55, 2.0, -3.55, 2.0 };
+	float texCoords[] = { 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0 };
+	GLuint controlsPage = LoadTexture("controls.png");
+
+	program.setModelMatrix(modelMatrix);
+	program.setProjectionMatrix(projectionMatrix);
+	program.setViewMatrix(viewMatrix);
+
+	modelMatrix.identity();
+
+	//GLuint controlsPage = LoadTexture("controls.png");
+
+	glBindTexture(GL_TEXTURE_2D, controlsPage);
+
+	//float vertices[] = { -2.5, -2.5, 2.5, -2.5, 2.5, 2.5, -2.5, -2.5, 2.5, 2.5, -2.5, 2.5 };
+	glVertexAttribPointer(program.positionAttribute, 2, GL_FLOAT, false, 0, vertices);
+	glEnableVertexAttribArray(program.positionAttribute);
+
+	//float texCoords[] = { 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0 };
+	glVertexAttribPointer(program.texCoordAttribute, 2, GL_FLOAT, false, 0, texCoords);
+	glEnableVertexAttribArray(program.texCoordAttribute);
+
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+
+	glDisableVertexAttribArray(program.positionAttribute);
+	glDisableVertexAttribArray(program.texCoordAttribute);
+
+	SDL_GL_SwapWindow(displayWindow);
+}
 
 int main(int argc, char *argv[])
 {
@@ -412,18 +541,10 @@ int main(int argc, char *argv[])
 	//glViewport(0, 0, 640, 360);
 	glViewport(0, 0, 1280, 720);
 	ShaderProgram program(RESOURCE_FOLDER"vertex_textured.glsl", RESOURCE_FOLDER"fragment_textured.glsl");
-	
 	float lastFrameTicks = 0.0f;
 	
-	//GLuint spriteSheet = LoadTexture("spritesheet.png");
-	GLuint letters = LoadTexture("letters.png");
 	GLuint goldenGearSpriteSheet = LoadTexture("golden_gear_spritesheet.png");
-	enum letterIndex { A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z };
-	int LETTER_SHIFT = 65;
-	//int message[] = { P, R, E, S, S, -1, S, P, A, C, E, -1, T, O, -1, B, E, G, I, N };
-	int playGame[] = { P, L, A, Y, -1, G, A, M, E};
-	int controls[] = { C, O, N, T, R, O, L, S };
-	int exit[] = { E, X, I, T };
+	//GLuint spriteSheet = LoadTexture("spritesheet.png");
 
 	std::ifstream infile("world1.txt");
 	std::string line;
@@ -441,176 +562,60 @@ int main(int argc, char *argv[])
 		}
 	}
 
-	Matrix projectionMatrix;
-	Matrix modelMatrix;
-	Matrix viewMatrix;
 	projectionMatrix.setOrthoProjection(-3.55, 3.55, -2.0f, 2.0f, -1.0f, 1.0f);
 	glUseProgram(program.programID);
 
-
-	float p1x = 0;
 	float p1vy = 0;
-	bool p1shoot = false;
-	int bulletCooldown = 0;
-	float espurrx = 0;
-	float espurrSpeed = 0.05;
-	int inactiveBullet = 6; //current inactive bullet index
-	enum GameState { STATE_MAIN_MENU, STATE_CONTROLS, STATE_GAME_LEVEL };
-	int state = STATE_MAIN_MENU;
 	float p1ax = 0.0f;
 
-	float vertices[] = { -3.55, -2.0, 3.55, -2.0, 3.55, 2.0, -3.55, -2.0, 3.55, 2.0, -3.55, 2.0 };
-	float texCoords[] = { 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0 };
-	GLuint controlsPage = LoadTexture("controls.png");
-
-	SDL_Event event;
-	bool done = false;
 	while (!done) {
 
 		switch (state) {
 
 		case STATE_MAIN_MENU:
-			while (SDL_PollEvent(&event)) {
-				if (event.type == SDL_QUIT || event.type == SDL_WINDOWEVENT_CLOSE) {
-					done = true;
-				}
-				else if (event.type == SDL_MOUSEBUTTONDOWN) { // MOUSEBUTTONDOWN
-					// Convert from pixels to OpenGL units
-					// units_x = (pixel_x / x_resolution) * ortho_width ) - ortho_width / 2.0;
-					float units_x = (((float)event.motion.x / 1280) * 7.1f) - 3.55f;
-					// units_y = ((y_resolution - pixel_y) / y_resolution) * ortho_height) - ortho_height / 2.0;
-					float units_y = (((float)(720 - event.motion.y) / 720) * 4.0f) - 2.0f;
-
-					if (units_x > -2.1f && units_x < -0.4f && units_y > -0.1f && units_y < 0.1f) {
-						state = STATE_GAME_LEVEL;
-					}
-
-					if (units_x > -2.1f && units_x < -0.6f && units_y > -0.6f && units_y < -0.4f) {
-						state = STATE_CONTROLS;
-						//state = STATE_GAME_LEVEL;
-					}
-
-					if (units_x > -2.1f && units_x < -1.4f && units_y > -1.1f && units_y < -0.9f) {
-						SDL_Quit();
-						return 0;
-					}
-				}
-			}
-			glClear(GL_COLOR_BUFFER_BIT);
-			
-			for (int i = 0; i < 9; ++i) { // Length of playGame
-				if (playGame[i] != -1) {
-					modelMatrix.identity();
-					modelMatrix.Translate(-3.45 + i*.2 + 1.4, 0, 0);
-					program.setModelMatrix(modelMatrix);
-					program.setProjectionMatrix(projectionMatrix);
-					program.setViewMatrix(viewMatrix);
-					DrawSpriteSheetSprite(&program, playGame[i] + LETTER_SHIFT, 16, 16, letters);
-				}
-			}
-
-			for (int i = 0; i < 8; ++i) { // Length of controls
-				if (controls[i] != -1) {
-					modelMatrix.identity();
-					modelMatrix.Translate(-3.45 + i*.2 + 1.4, -0.5, 0);
-					program.setModelMatrix(modelMatrix);
-					program.setProjectionMatrix(projectionMatrix);
-					program.setViewMatrix(viewMatrix);
-					DrawSpriteSheetSprite(&program, controls[i] + LETTER_SHIFT, 16, 16, letters);
-				}
-			}
-
-			for (int i = 0; i < 4; ++i) { // Length of exit
-				if (exit[i] != -1) {
-					modelMatrix.identity();
-					modelMatrix.Translate(-3.45 + i*.2 + 1.4, -1, 0);
-					program.setModelMatrix(modelMatrix);
-					program.setProjectionMatrix(projectionMatrix);
-					program.setViewMatrix(viewMatrix);
-					DrawSpriteSheetSprite(&program, exit[i] + LETTER_SHIFT, 16, 16, letters);
-				}
-			}
-
-			SDL_GL_SwapWindow(displayWindow);
+			main_menu(program);
 			break;
 
 		case STATE_CONTROLS:
-			while (SDL_PollEvent(&event)) {
-				if (event.type == SDL_QUIT || event.type == SDL_WINDOWEVENT_CLOSE) {
-					done = true;
-				}
-				else if (event.type == SDL_KEYDOWN) {
-					if (event.key.keysym.scancode == SDL_SCANCODE_ESCAPE) {
-						state = STATE_MAIN_MENU;
-					}
-				}
-			}
-
-			glClear(GL_COLOR_BUFFER_BIT);
-
-			program.setModelMatrix(modelMatrix);
-			program.setProjectionMatrix(projectionMatrix);
-			program.setViewMatrix(viewMatrix);
-
-			modelMatrix.identity();
-
-			//GLuint controls = LoadTexture("controls.png");
-
-			glBindTexture(GL_TEXTURE_2D, controlsPage);
-
-			//float vertices[] = { -2.5, -2.5, 2.5, -2.5, 2.5, 2.5, -2.5, -2.5, 2.5, 2.5, -2.5, 2.5 };
-			glVertexAttribPointer(program.positionAttribute, 2, GL_FLOAT, false, 0, vertices);
-			glEnableVertexAttribArray(program.positionAttribute);
-
-			//float texCoords[] = { 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0 };
-			glVertexAttribPointer(program.texCoordAttribute, 2, GL_FLOAT, false, 0, texCoords);
-			glEnableVertexAttribArray(program.texCoordAttribute);
-
-			glDrawArrays(GL_TRIANGLES, 0, 6);
-
-			glDisableVertexAttribArray(program.positionAttribute);
-			glDisableVertexAttribArray(program.texCoordAttribute);
-
-			SDL_GL_SwapWindow(displayWindow);
+			controls(program);
 			break;
 
 		case STATE_GAME_LEVEL:
+			p1ax = 0;
+			const Uint8 *keys = SDL_GetKeyboardState(NULL);
+			if (keys[SDL_SCANCODE_LEFT] || keys[SDL_SCANCODE_A] || keys[SDL_SCANCODE_K]) {
+				p1ax += -5;
+			}
+			if (keys[SDL_SCANCODE_RIGHT] || keys[SDL_SCANCODE_D] || keys[SDL_SCANCODE_SEMICOLON]) {
+				p1ax += 5;
+			}
 			while (SDL_PollEvent(&event)) {
 				if (event.type == SDL_QUIT || event.type == SDL_WINDOWEVENT_CLOSE || event.key.keysym.scancode == SDL_SCANCODE_ESCAPE) {
 					done = true;
 				}
 				else if (event.type == SDL_KEYDOWN) {
-					if (event.key.keysym.scancode == SDL_SCANCODE_RIGHT || event.key.keysym.scancode == SDL_SCANCODE_SEMICOLON || event.key.keysym.scancode == SDL_SCANCODE_D) {
-						p1ax = 5;
-					}
-					else if (event.key.keysym.scancode == SDL_SCANCODE_LEFT || event.key.keysym.scancode == SDL_SCANCODE_K || event.key.keysym.scancode == SDL_SCANCODE_A) {
-						p1ax = -5;
-					}
-					else if (event.key.keysym.scancode == SDL_SCANCODE_SPACE) {
+					if (event.key.keysym.scancode == SDL_SCANCODE_SPACE) {
 						p1vy = 3.1;
 					}
 				}
 				else if (event.type == SDL_KEYUP) {
-					if (event.key.keysym.scancode == SDL_SCANCODE_RIGHT || event.key.keysym.scancode == SDL_SCANCODE_LEFT || event.key.keysym.scancode == SDL_SCANCODE_SEMICOLON || 
-						event.key.keysym.scancode == SDL_SCANCODE_D || event.key.keysym.scancode == SDL_SCANCODE_K || event.key.keysym.scancode == SDL_SCANCODE_A) {
-						p1ax = 0;
-					}
-					else if (event.key.keysym.scancode == SDL_SCANCODE_SPACE) {
+					if (event.key.keysym.scancode == SDL_SCANCODE_SPACE) {
 						p1vy = 0;
 					}
 				}
-				if (event.type == SDL_MOUSEBUTTONDOWN && bulletCooldown <= 0) {
+				if (event.type == SDL_MOUSEBUTTONDOWN) {
 					if (event.button.button == 1) {
-						p1shoot = true;
+						
 					}
 				}
 				else if (event.type == SDL_MOUSEBUTTONUP) {
 					if (event.button.button == 1) {
-						p1shoot = false;
+						
 					}
 				}
 			}
 
+			////////MOVEMENT//////////////////////////////////////////////////////////////////////////////////
 			//timestep
 			float ticks = (float)SDL_GetTicks() / 1000.0f;
 			float elapsed = ticks - lastFrameTicks;
@@ -626,41 +631,6 @@ int main(int argc, char *argv[])
 				Update(p1ax, p1vy, ticks, FIXED_TIMESTEP);
 			}
 			Update(p1ax, p1vy, ticks, fixedElapsed);
-
-			////////MOVEMENT//////////////////////////////////////////////////////////////////////////////////
-			/*for (int i = 0; i < entities.size(); ++i) {
-				if (entities[i].type == "player") {
-					entities[i].acceleration.x = p1ax;
-					if (entities[i].collidedBottom) {
-						entities[i].velocity.y = p1vy;
-					}
-				}
-				else if (entities[i].type == "gear") {
-					entities[i].position.y += 0.001 * sin(ticks * 10 / PI);
-				}
-				if (!entities[i].isStatic) {
-					entities[i].acceleration.y = -5;
-				}
-				entities[i].collidedTop = false;
-				entities[i].collidedBottom = false;
-				entities[i].collidedLeft = false;
-				entities[i].collidedRight = false;
-
-				entities[i].velocity.x = lerp(entities[i].velocity.x, 0.0f, FIXED_TIMESTEP * 5);
-				entities[i].velocity.y = lerp(entities[i].velocity.y, 0.0f, FIXED_TIMESTEP * 1);
-
-				entities[i].velocity.x += entities[i].acceleration.x * FIXED_TIMESTEP;
-				entities[i].velocity.y += entities[i].acceleration.y * FIXED_TIMESTEP;
-
-				entities[i].position.x += entities[i].velocity.x * FIXED_TIMESTEP;
-				if (!entities[i].isStatic) {
-					collisionx(entities[i]);
-				}
-				entities[i].position.y += entities[i].velocity.y * FIXED_TIMESTEP;
-				if (!entities[i].isStatic) {
-					collisiony(entities[i]);
-				}
-			}*/
 
 			////////ENTITY COLLISION//////////////////////////////////////////////////////////////////////////
 			for (int i = 0; i < entities.size(); ++i) {
