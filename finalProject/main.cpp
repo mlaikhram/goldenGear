@@ -463,7 +463,6 @@ void screenShake(float scale, ShaderProgram &program) {
 	//add the particle effect in here too
 	screenShakeIntensity = scale;
 	screenShakeValue = 0.0f;
-	//Mix_PlayChannel(-1, groundBreak, 0); //this is just for testing, remove it once its implemented
 }
 
 void killRadius(Entity &entity, float r) {
@@ -500,7 +499,7 @@ void collisiony(Entity &entity, ShaderProgram &program) {
 		else {
 			if (entity.type == "player" && entity.velocity.y <= -7.0f) {
 				Mix_PlayChannel(-1, groundSmash, 0);
-				killRadius(entity, 3.5f * TILE_SIZE);
+				killRadius(entity, 4.0f * TILE_SIZE);
 			}
 			entity.position.y += -1.0f * (entity.position.y) - gridY * TILE_SIZE + 0.001f;
 			entity.velocity.y = 0.0f;
@@ -1006,6 +1005,36 @@ void level_clear() {
 
 }
 
+void playerEntityCollision() {
+	for (unsigned int j = 0; j < entities.size(); ++j) {
+		if (entities[j].exists) {
+
+			if (entities[j].type == "gear" && entityCollision(entities[pIndex], entities[j])) {
+				entities[j].exists = false;
+				gearCount++;
+				Mix_PlayChannel(-1, gearPickup, 0);
+				break;
+			}
+			else if (entities[j].type == "silverGear" && entityCollision(entities[pIndex], entities[j])) {
+				entities[j].exists = false;
+				gearCount += 10;
+				Mix_PlayChannel(-1, gearPickup, 0);
+				break;
+			}
+			else if (entities[j].type == "crab" && entityCollision(entities[pIndex], entities[j])) {
+				if (entities[pIndex].velocity.y <= -7.0f) {
+					entities[j].exists = false;
+				}
+				else {
+					state = STATE_GAME_OVER;
+				}
+				break;
+			}
+
+		}
+	}
+}
+
 int main(int argc, char *argv[])
 {
 	SDL_Init(SDL_INIT_VIDEO);
@@ -1025,8 +1054,6 @@ int main(int argc, char *argv[])
 	GLuint gameOverPage = LoadTexture("game_over.png");
 	GLuint letters = LoadTexture("letters.png");
 	GLuint goldenGearSpriteSheet = LoadTexture("golden_gear_spritesheet.png");
-
-	//new_game(program, level);
 
 	projectionMatrix.setOrthoProjection(-3.55f, 3.55f, -2.0f, 2.0f, -1.0f, 1.0f);
 	glUseProgram(program.programID);
@@ -1062,7 +1089,7 @@ int main(int argc, char *argv[])
 	magnetAttract = Mix_LoadWAV("magnetAttract.wav");
 	Mix_VolumeChunk(magnetAttract, 100);
 	gearPickup = Mix_LoadWAV("gearPickup.wav");
-	Mix_VolumeChunk(gearPickup, 10000000000);
+	Mix_VolumeChunk(gearPickup, 100);
 	groundBreak = Mix_LoadWAV("groundBreak.wav");
 	Mix_VolumeChunk(groundBreak, 100);
 	groundSmash = Mix_LoadWAV("groundSmash.wav");
@@ -1109,7 +1136,6 @@ int main(int argc, char *argv[])
 
 		case STATE_CONTROLS:
 			controls(program, controlsPage);
-			//game_over(program, gameOverPage, letters);
 			break;
 
 		case STATE_GAME_OVER:
@@ -1181,7 +1207,6 @@ int main(int argc, char *argv[])
 				else if (event.type == SDL_KEYDOWN) {
 					if (event.key.keysym.scancode == SDL_SCANCODE_SPACE) {
 						p1jump = 3.1f;
-						//entities[pIndex].velocity.y = 3.1f;
 					}
 				}
 				else if (event.type == SDL_KEYUP) {
@@ -1259,38 +1284,8 @@ int main(int argc, char *argv[])
 			}
 
 			////////ENTITY COLLISION//////////////////////////////////////////////////////////////////////////
-			for (unsigned int i = 0; i < entities.size(); ++i) {
-				if (entities[i].type == "player") {
-					for (unsigned int j = 0; j < entities.size(); ++j) {
-						if (entities[j].exists) {
+			playerEntityCollision();
 
-							if (entities[j].type == "gear" && entityCollision(entities[i], entities[j])) {
-								entities[j].exists = false;
-								gearCount++;
-								Mix_PlayChannel(-1, gearPickup, 0);
-								break;
-							}
-							else if (entities[j].type == "silverGear" && entityCollision(entities[i], entities[j])) {
-								entities[j].exists = false;
-								gearCount += 10;
-								Mix_PlayChannel(-1, gearPickup, 0);
-								break;
-							}
-							else if (entities[j].type == "crab" && entityCollision(entities[i], entities[j])) {
-								if (entities[i].velocity.y <= -7.0f) {
-									entities[j].exists = false;
-								}
-								else {
-									state = STATE_GAME_OVER;
-								}
-								break;
-							}
-
-						}
-					}
-					break;
-				}
-			}
 
 			///////DRAWING////////////////////////////////////////////////////////////////////////////////////
 			glClear(GL_COLOR_BUFFER_BIT);
@@ -1302,7 +1297,6 @@ int main(int argc, char *argv[])
 			for (int y = 0; y < mapHeight; ++y) {
 				for (int x = 0; x < mapWidth; ++x) {
 					modelMatrix.identity();
-					//modelMatrix.Translate(x*TILE_SIZE - (3.55 - TILE_SIZE/2),(32-y - 1)*TILE_SIZE - (2.0f - TILE_SIZE/2), 0);
 					modelMatrix.Translate(x*TILE_SIZE, (mapHeight - y - 1)*TILE_SIZE, 0);
 					program.setModelMatrix(modelMatrix);
 					program.setProjectionMatrix(projectionMatrix);
@@ -1319,17 +1313,6 @@ int main(int argc, char *argv[])
 						minx = x;
 						miny = y;					
 					}
-					/*
-					if (levelData[y][x] >= 9 && levelData[y][x] <= 12 && mx == x && my == y) {
-						modelMatrix.identity();
-						//modelMatrix.Translate(x*TILE_SIZE - (3.55 - TILE_SIZE/2),(32-y - 1)*TILE_SIZE - (2.0f - TILE_SIZE/2), 0);
-						modelMatrix.Translate(x*TILE_SIZE, (mapHeight - y - 1)*TILE_SIZE, 0);
-						program.setModelMatrix(modelMatrix);
-						program.setProjectionMatrix(projectionMatrix);
-						program.setViewMatrix(viewMatrix);
-						DrawSpriteSheetSprite(&program, 26, 20, 10, goldenGearSpriteSheet);
-					}*/
-
 				}
 			}
 			//draw target on nearest magnet
@@ -1342,27 +1325,11 @@ int main(int argc, char *argv[])
 				program.setViewMatrix(viewMatrix);
 				DrawSpriteSheetSprite(&program, 27, 20, 10, goldenGearSpriteSheet);
 			}
-
-			/*
-			int mx;
-			int my;
-			float units_x = (((float)event.motion.x / 1280) * 7.1f) - 3.55f;
-			float units_y = (((float)(720 - event.motion.y) / 720) * 4.0f) - 2.0f;
-			worldToTileCoordinates(units_x, units_y, &mx, &my);
-			
-			modelMatrix.identity();
-			//modelMatrix.Translate(x*TILE_SIZE - (3.55 - TILE_SIZE/2),(32-y - 1)*TILE_SIZE - (2.0f - TILE_SIZE/2), 0);
-			modelMatrix.Translate(mx*TILE_SIZE, (mapHeight - my - 1)*TILE_SIZE, 0);
-			program.setModelMatrix(modelMatrix);
-			program.setProjectionMatrix(projectionMatrix);
-			program.setViewMatrix(viewMatrix);
-			DrawSpriteSheetSprite(&program, 26, 20, 10, goldenGearSpriteSheet);*/
 			
 			std::vector<std::string> types = {"gear", "silverGear", "goldenGear", "target", "crab", "star", "bullet"};
 			for (unsigned int i = 0; i < entities.size(); ++i) {
 				if (entities[i].exists) {
 					modelMatrix.identity();
-					//modelMatrix.Translate(entities[i].position.x - 3.55 + TILE_SIZE / 2, entities[i].position.y + TILE_SIZE / 2 + (mapHeight*TILE_SIZE - 2.0f), 0);
 					modelMatrix.Translate(entities[i].position.x, entities[i].position.y + mapHeight*TILE_SIZE, 0);
 					if (entities[i].type == "gear" || entities[i].type == "silverGear" || entities[i].type == "target") {
 						modelMatrix.Rotate(-1 * ticks);
@@ -1374,7 +1341,6 @@ int main(int argc, char *argv[])
 						DrawSpriteSheetSprite(&program, 60, 20, 10, goldenGearSpriteSheet);
 
 						modelMatrix.identity();
-						//modelMatrix.Translate(entities[i].position.x - 3.55 + TILE_SIZE / 2, entities[i].position.y + 3 * TILE_SIZE / 2 + (mapHeight*TILE_SIZE - 2.0f), 0);
 						modelMatrix.Translate(entities[i].position.x, entities[i].position.y + mapHeight*TILE_SIZE + TILE_SIZE, 0);
 
 						program.setModelMatrix(modelMatrix);
