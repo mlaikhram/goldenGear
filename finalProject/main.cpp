@@ -187,6 +187,7 @@ bool readHeader(std::ifstream &stream) {
 	}
 }
 
+
 bool readLayerData(std::ifstream &stream) {
 	std::string line;
 	while (getline(stream, line)) {

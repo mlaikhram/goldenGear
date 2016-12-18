@@ -13,7 +13,6 @@ Add sound effects
 
 Mechanical:
 Add nearest enemy snapping for targets (based on mouse position)
-Allow terminal velocity to break through wooden floors
 Add crab functionality
 Add star functionality
 

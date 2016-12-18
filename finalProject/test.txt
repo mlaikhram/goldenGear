@@ -44,97 +44,97 @@ data=
 9,19,22,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,4,
 2,2,2,2,10,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,3,19,19,19,19,4
 
-[Object Layer 1]
+[objectLayer]
 # crab
 type=crab
 location=9,31,1,1
 
-[Object Layer 1]
+[objectLayer]
 # crab
 type=crab
 location=15,31,1,1
 
-[Object Layer 1]
+[objectLayer]
 # crab
 type=crab
 location=21,31,1,1
 
-[Object Layer 1]
+[objectLayer]
 # crab
 type=crab
 location=25,31,1,1
 
-[Object Layer 1]
+[objectLayer]
 # crab
 type=crab
 location=18,31,1,1
 
-[Object Layer 1]
+[objectLayer]
 # crab
 type=crab
 location=12,31,1,1
 
-[Object Layer 1]
+[objectLayer]
 # crab
 type=crab
 location=7,31,1,1
 
-[Object Layer 1]
+[objectLayer]
 # star
 type=star
 location=22,11,1,1
 
-[Object Layer 1]
+[objectLayer]
 # silverGear
 type=silverGear
 location=18,20,1,1
 
-[Object Layer 1]
+[objectLayer]
 # silverGear
 type=silverGear
 location=24,20,1,1
 
-[Object Layer 1]
+[objectLayer]
 # silverGear
 type=silverGear
 location=12,20,1,1
 
-[Object Layer 1]
+[objectLayer]
 # silverGear
 type=silverGear
 location=6,20,1,1
 
-[Object Layer 1]
+[objectLayer]
 # silverGear
 type=silverGear
 location=9,30,1,1
 
-[Object Layer 1]
+[objectLayer]
 # silverGear
 type=silverGear
 location=15,30,1,1
 
-[Object Layer 1]
+[objectLayer]
 # silverGear
 type=silverGear
 location=21,30,1,1
 
-[Object Layer 1]
+[objectLayer]
 # silverGear
 type=silverGear
 location=28,12,1,1
 
-[Object Layer 1]
+[objectLayer]
 # silverGear
 type=silverGear
 location=12,14,1,1
 
-[Object Layer 1]
+[objectLayer]
 # silverGear
 type=silverGear
 location=22,14,1,1
 
-[Object Layer 1]
+[objectLayer]
 # player
 type=player
 location=2,31,1,1
