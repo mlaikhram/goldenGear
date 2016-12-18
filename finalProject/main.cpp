@@ -12,6 +12,7 @@
 #include <iostream>
 #include <sstream>
 #include <cmath>
+#include <SDL_mixer.h> // Sound
 
 #ifdef _WINDOWS
 #define RESOURCE_FOLDER ""
@@ -106,6 +107,25 @@ public:
 	//SheetSprite sprite;
 };
 
+//class Particle {
+//public:
+//	Vector3 position;
+//	Vector3 velocity;
+//	float lifetime;
+//};
+//
+//class ParticleEmitter {
+//public:
+//	ParticleEmitter(unsigned int particleCount);
+//	ParticleEmitter();
+//	//~ParticleEmitter();
+//	void UpdatePart(float elapsed);
+//	void RenderPart();
+//	Vector3 position (0.0f, 0.0f, 0.0f);
+//	Vector3 gravity;
+//	float maxLifetime;
+//	std::vector<Particle> particles;
+//};
 
 GLuint LoadTexture(const char *image_path) 
 {
@@ -397,6 +417,12 @@ void breakWood(int x, int y) {
 	}
 }
 
+// Sound globals
+Mix_Chunk *magnetRepel;
+Mix_Chunk *magnetAttract;
+Mix_Chunk *gearPickup;
+Mix_Chunk *groundBreak;
+
 void killRadius(Entity &entity, float r) {
 	for (unsigned int i = 0; i < entities.size(); ++i) {
 		if (entities[i].exists && (distance(entity.position.x, entity.position.y, entities[i].position.x, entities[i].position.y) <= r) && (&entity != &entities[i]) &&
@@ -404,6 +430,7 @@ void killRadius(Entity &entity, float r) {
 			entities[i].exists = false;
 		}
 	}
+	Mix_PlayChannel(-1, groundBreak, 0);
 }
 
 void collisiony(Entity &entity) {
@@ -844,6 +871,18 @@ int main(int argc, char *argv[])
 	//int gearCount = 0; // ----------------------------------------
 	int gearCountArr[] = { NUM_SHIFT, NUM_SHIFT, NUM_SHIFT };
 
+	//// Loading sound and music
+	Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 4096);
+	magnetRepel = Mix_LoadWAV("magnetRepel.wav");
+	magnetAttract = Mix_LoadWAV("magnetAttract.wav");
+	gearPickup = Mix_LoadWAV("gearPickup.wav");
+	groundBreak = Mix_LoadWAV("groundBreak.wav");
+	Mix_Music *gameMusic;
+	gameMusic = Mix_LoadMUS("gameMusic.mp3");
+	Mix_PlayMusic(gameMusic, -1);
+	//Mix_Music *menuMusic;
+	//menuMusic = Mix_LoadMUS("menuMusic.mp3");
+
 	while (!done) {
 
 		switch (state) {
@@ -862,7 +901,6 @@ int main(int argc, char *argv[])
 			break;
 
 		case STATE_GAME_LEVEL:
-
 			/////////////INPUT////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 			p1ax = 0.0f;
 			p1ay = -5.0f;
@@ -878,6 +916,7 @@ int main(int argc, char *argv[])
 					if (p1x == minx && p1y + 10 >= miny && p1y < miny) {
 						p1ay = -10.0f;
 					}
+					Mix_PlayChannel(-1, magnetAttract, 0);
 					break;
 				case 10:
 					if ((p1y == miny || p1y - 1 == miny) && p1x + 10 >= minx && p1x < minx) {
@@ -885,6 +924,7 @@ int main(int argc, char *argv[])
 						entities[pIndex].velocity.y = 0.0f;
 						p1ay = 0.0f;
 					}
+					Mix_PlayChannel(-1, magnetAttract, 0);
 					break;
 				case 11:
 					if ((p1y == miny || p1y - 1 == miny) && p1x - 10 <= minx && p1x > minx) {
@@ -892,11 +932,14 @@ int main(int argc, char *argv[])
 						entities[pIndex].velocity.y = 0.0f;
 						p1ay = 0.0f;
 					}
+					Mix_PlayChannel(-1, magnetAttract, 0);
 					break;
 				case 12:
 					if (p1x == minx && p1y - 10 <= miny && p1y > miny) {
 						p1ay = 5.0f;
+
 					}
+					Mix_PlayChannel(-1, magnetAttract, 0);
 					break;
 				default:
 					break;
@@ -936,21 +979,25 @@ int main(int argc, char *argv[])
 							if (p1x == minx && p1y + 1 == miny) {
 								p1vy = 7.0f;
 							}
+							Mix_PlayChannel(-1, magnetRepel, 0);
 							break;
 						case 10:
 							if ((p1y == miny || p1y - 1 == miny) && p1x + 1 == minx) {
 								p1vx = -14.0f;
 							}
+							Mix_PlayChannel(-1, magnetRepel, 0);
 							break;
 						case 11:
 							if ((p1y == miny || p1y - 1 == miny) && p1x - 1 == minx) {
 								p1vx = 14.0;
 							}
+							Mix_PlayChannel(-1, magnetRepel, 0);
 							break;
 						case 12:
 							if (p1x == minx && p1y - 2 == miny) {
 								p1vy = -10.0f;
 							}
+							Mix_PlayChannel(-1, magnetRepel, 0);
 							break;
 						default:
 							break;
@@ -994,11 +1041,13 @@ int main(int argc, char *argv[])
 							if (entities[j].type == "gear" && entityCollision(entities[i], entities[j])) {
 								entities[j].exists = false;
 								gearCount++;
+								Mix_PlayChannel(-1, gearPickup, 0);
 								break;
 							}
 							else if (entities[j].type == "silverGear" && entityCollision(entities[i], entities[j])) {
 								entities[j].exists = false;
 								gearCount += 10;
+								Mix_PlayChannel(-1, gearPickup, 0);
 								break;
 							}
 							else if (entities[j].type == "crab" && entityCollision(entities[i], entities[j])) {

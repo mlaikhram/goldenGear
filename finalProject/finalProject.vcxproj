@@ -98,6 +98,14 @@
     <Text Include="test.txt" />
     <Text Include="world1.txt" />
   </ItemGroup>
+  <ItemGroup>
+    <Media Include="gameMusic.mp3" />
+    <Media Include="gearPickup.wav" />
+    <Media Include="groundBreak.wav" />
+    <Media Include="magnetAttract.wav" />
+    <Media Include="magnetRepel.wav" />
+    <Media Include="menuMusic.mp3" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
