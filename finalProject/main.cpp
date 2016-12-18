@@ -350,7 +350,7 @@ void cliffx(Entity &entity) {
 
 }
 
-void collisionx(Entity &entity) {
+void collisionx(Entity &entity, ShaderProgram &program) {
 	int gridX, gridY;
 
 	//check left
@@ -417,6 +417,10 @@ void breakWood(int x, int y) {
 	}
 }
 
+Matrix projectionMatrix;
+Matrix modelMatrix;
+Matrix viewMatrix;
+
 // Sound globals
 Mix_Chunk *magnetRepel;
 Mix_Chunk *magnetAttract;
@@ -424,6 +428,11 @@ Mix_Chunk *gearPickup;
 Mix_Chunk *groundBreak;
 Mix_Chunk *groundSmash;
 Mix_Chunk *jump;
+
+void screenShake(float scale, ShaderProgram &program) {
+	//add the particle effect in here too
+	Mix_PlayChannel(-1, groundSmash, 0); //this is just for testing, remove it once its implemented
+}
 
 void killRadius(Entity &entity, float r) {
 	for (unsigned int i = 0; i < entities.size(); ++i) {
@@ -435,7 +444,7 @@ void killRadius(Entity &entity, float r) {
 	Mix_PlayChannel(-1, groundBreak, 0);
 }
 
-void collisiony(Entity &entity) {
+void collisiony(Entity &entity, ShaderProgram &program) {
 	int gridX, gridY;
 	float top = 0.0f;
 	if (entity.type == "player") {
@@ -449,10 +458,8 @@ void collisiony(Entity &entity) {
 	}
 	if (!(gridX < 0 || gridX > mapWidth || gridY < 0 || gridY > mapHeight) && levelData[gridY][gridX] < 18)
 	{
-		if (entity.type == "player" && entity.velocity.y <= -1.0f) {
-			//Mix_PlayChannel(-1, groundSmash, 0);
-			//particle dust
-			//screen shake
+		if (entity.type == "player" && entity.velocity.y < -1.0) {
+			screenShake(1.0f, program);
 		}
 		if (entity.type == "player" && entity.velocity.y <= -7.0f && levelData[gridY][gridX] == 14) {
 			breakWood(gridX, gridY);
@@ -524,10 +531,15 @@ float cooldown;
 
 #define FIXED_TIMESTEP 0.0166666f
 #define MAX_TIMESTEPS 6
-void Update(float ticks, float time) {
+void Update(float ticks, float time, ShaderProgram &program) {
 	for (unsigned int i = 0; i < entities.size(); ++i) {
 
+		bool prevGrounded = true;
+
 		if (entities[i].type == "player") {
+
+			prevGrounded = entities[i].collidedBottom;
+
 			entities[i].acceleration.x = p1ax;
 			//entities[i].acceleration.y = p1ay;
 
@@ -587,19 +599,15 @@ void Update(float ticks, float time) {
 
 		entities[i].position.y += entities[i].velocity.y * time;
 		if (!entities[i].isStatic) {
-			collisiony(entities[i]);
+			collisiony(entities[i], program);
 		}
 		entities[i].position.x += entities[i].velocity.x * time;
 		if (!entities[i].isStatic) {
-			collisionx(entities[i]);
+			collisionx(entities[i], program);
 			cliffx(entities[i]);
 		}
 	}
 }
-
-Matrix projectionMatrix;
-Matrix modelMatrix;
-Matrix viewMatrix;
 
 enum letterIndex { A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z };
 int LETTER_SHIFT = 65;
@@ -1040,9 +1048,9 @@ int main(int argc, char *argv[])
 			}
 			while (fixedElapsed >= FIXED_TIMESTEP) {
 				fixedElapsed -= FIXED_TIMESTEP;
-				Update(ticks, FIXED_TIMESTEP);
+				Update(ticks, FIXED_TIMESTEP, program);
 			}
-			Update(ticks, fixedElapsed);
+			Update(ticks, fixedElapsed, program);
 			units_mx = units_x + entities[pIndex].position.x + TILE_SIZE / 2;
 			units_my = units_y + entities[pIndex].position.y + mapHeight*TILE_SIZE + TILE_SIZE / 2;
 
