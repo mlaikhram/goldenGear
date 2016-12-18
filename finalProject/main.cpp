@@ -114,18 +114,42 @@ public:
 //	float lifetime;
 //};
 //
+//Vector3 pos(0.0f, 0.0f, 0.0f);
+//Vector3 grav(5.0f, 5.0f, 0.0f);
+//float lifeTime = 10000.0f;
+//
 //class ParticleEmitter {
 //public:
 //	ParticleEmitter(unsigned int particleCount);
-//	ParticleEmitter();
+//	ParticleEmitter() : position(pos), gravity(grav), maxLifetime(lifeTime) {}
 //	//~ParticleEmitter();
+//
 //	void UpdatePart(float elapsed);
-//	void RenderPart();
-//	Vector3 position (0.0f, 0.0f, 0.0f);
+//	void RenderPart(ShaderProgram &program);
+//
+//	Vector3 position;
 //	Vector3 gravity;
 //	float maxLifetime;
+//
 //	std::vector<Particle> particles;
 //};
+//
+//void ParticleEmitter::UpdatePart(float elapsed) {
+//	for (Particle p : particles) {
+//		p.position.x += p.velocity.x * 2.0f;
+//	}
+//}
+//
+//void ParticleEmitter::RenderPart(ShaderProgram &program) {
+//	std::vector<float> vertices;
+//	for (int i = 0; i < particles.size(); i++) {
+//		vertices.push_back(particles[i].position.x);
+//		vertices.push_back(particles[i].position.y);
+//	}
+//	glVertexAttribPointer(program.positionAttribute, 2, GL_FLOAT, false, 0, vertices.data());
+//	glEnableVertexAttribArray(program.positionAttribute);
+//	glDrawArrays(GL_POINTS, 0, vertices.size() / 2);
+//}
 
 GLuint LoadTexture(const char *image_path) 
 {
@@ -1023,16 +1047,36 @@ int main(int argc, char *argv[])
 	//// Loading sound and music
 	Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 4096);
 	magnetRepel = Mix_LoadWAV("magnetRepel.wav");
+	Mix_VolumeChunk(magnetRepel, 100);
 	magnetAttract = Mix_LoadWAV("magnetAttract.wav");
+	Mix_VolumeChunk(magnetAttract, 100);
 	gearPickup = Mix_LoadWAV("gearPickup.wav");
+	Mix_VolumeChunk(gearPickup, 10000000000);
 	groundBreak = Mix_LoadWAV("groundBreak.wav");
+	Mix_VolumeChunk(groundBreak, 100);
 	groundSmash = Mix_LoadWAV("groundSmash.wav");
+	Mix_VolumeChunk(groundSmash, 100);
 	jump = Mix_LoadWAV("jump.wav");
+	Mix_VolumeChunk(jump, 50);
+
 	Mix_Music *gameMusic;
 	gameMusic = Mix_LoadMUS("gameMusic.mp3");
+	Mix_VolumeMusic(50);
 	Mix_PlayMusic(gameMusic, -1);
 	//Mix_Music *menuMusic;
 	//menuMusic = Mix_LoadMUS("menuMusic.mp3");
+
+	//ParticleEmitter p;
+	//for (int i = 0; i < 1000; ++i) {
+	//	Particle part;
+	//	part.position = pos;
+	//	part.velocity = grav;
+	//	part.lifetime = lifeTime;
+	//	p.particles.push_back(part);
+	//	//pos.x += 0.002f;
+	//}
+	//p.UpdatePart(100.0f);
+	//p.RenderPart(program);
 
 	while (!done) {
 
@@ -1056,6 +1100,7 @@ int main(int argc, char *argv[])
 			break;
 
 		case STATE_GAME_LEVEL:
+
 			/////////////INPUT////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 			p1ax = 0.0f;
 			p1ay = -5.0f;
