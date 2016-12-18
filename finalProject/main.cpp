@@ -85,7 +85,8 @@ public:
 	//Entity() { Entity(Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), 0.0f, SheetSprite()); }
 	//Entity(Vector3 position, Vector3 velocity, Vector3 size, float rotation, SheetSprite sprite) : position(position), velocity(velocity), size(size), rotation(rotation), sprite(sprite) {}
 	Entity(std::string type, bool isStatic, Vector3 position, Vector3 velocity = Vector3(0, 0, 0), Vector3 acceleration = Vector3(0, 0, 0), Vector3 size = Vector3(0, 0, 0), float rotation = 0.0f) :
-		type(type), isStatic(isStatic), position(position), velocity(velocity), acceleration(acceleration), size(size), rotation(rotation), exists(true), collidedTop(false), collidedBottom(false), collidedLeft(false), collidedRight(false) {}
+		type(type), isStatic(isStatic), position(position), velocity(velocity), acceleration(acceleration), size(size), rotation(rotation), exists(true), 
+		collidedTop(false), collidedBottom(false), collidedLeft(false), collidedRight(false), cliffLeft(false), cliffRight(false), cliffDown(false) {}
 	//void Draw();
 	std::string type;
 	bool exists;
@@ -99,6 +100,9 @@ public:
 	bool collidedBottom;
 	bool collidedLeft;
 	bool collidedRight;
+	bool cliffLeft;
+	bool cliffRight;
+	bool cliffDown;
 	//SheetSprite sprite;
 };
 
@@ -287,6 +291,44 @@ void handleOOB(Entity &entity) {
 	}
 }
 
+void cliffx(Entity &entity) {
+	int gridX, gridY;
+
+	//check left
+	worldToTileCoordinates(entity.position.x - 0.008f, entity.position.y - 0.008f, &gridX, &gridY);
+	if (testOutOfBounds(gridX, gridY)) {
+		handleOOB(entity);
+		return;
+	}
+	if (!(gridX < 0 || gridX > mapWidth || gridY < 0 || gridY > mapHeight) && levelData[gridY][gridX] >= 18)
+	{
+		entity.cliffLeft = true;
+	}
+
+	//check right
+	worldToTileCoordinates(entity.position.x + TILE_SIZE + 0.008f, entity.position.y - 0.008f, &gridX, &gridY);
+	if (testOutOfBounds(gridX, gridY)) {
+		handleOOB(entity);
+		return;
+	}
+	if (!(gridX < 0 || gridX > mapWidth || gridY < 0 || gridY > mapHeight) && levelData[gridY][gridX] >= 18)
+	{
+		entity.cliffRight = true;
+	}
+
+	//check down
+	worldToTileCoordinates(entity.position.x + TILE_SIZE / 2, entity.position.y - 0.008f, &gridX, &gridY);
+	if (testOutOfBounds(gridX, gridY)) {
+		handleOOB(entity);
+		return;
+	}
+	if (!(gridX < 0 || gridX > mapWidth || gridY < 0 || gridY > mapHeight) && levelData[gridY][gridX] >= 18)
+	{
+		entity.cliffDown = true;
+	}
+
+}
+
 void collisionx(Entity &entity) {
 	int gridX, gridY;
 
@@ -342,6 +384,27 @@ void collisionx(Entity &entity) {
 	}
 }
 
+float distance(double x1, double y1, double x2, double y2) {
+	return (float)sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
+}
+
+void breakWood(int x, int y) {
+	if (!testOutOfBounds(x, y) && levelData[y][x] == 14) {
+		levelData[y][x] = 18;
+		breakWood(x + 1, y);
+		breakWood(x - 1, y);
+	}
+}
+
+void killRadius(Entity &entity, float r) {
+	for (unsigned int i = 0; i < entities.size(); ++i) {
+		if (entities[i].exists && (distance(entity.position.x, entity.position.y, entities[i].position.x, entities[i].position.y) <= r) && (&entity != &entities[i]) &&
+			entities[i].type != "gear" && entities[i].type != "silverGear" && entities[i].type != "goldenGear") {
+			entities[i].exists = false;
+		}
+	}
+}
+
 void collisiony(Entity &entity) {
 	int gridX, gridY;
 	float top = 0.0f;
@@ -356,9 +419,15 @@ void collisiony(Entity &entity) {
 	}
 	if (!(gridX < 0 || gridX > mapWidth || gridY < 0 || gridY > mapHeight) && levelData[gridY][gridX] < 18)
 	{
-		entity.position.y += -1.0f * (entity.position.y) - gridY * TILE_SIZE + 0.001f;
-		entity.velocity.y = 0.0f;
-		entity.collidedBottom = true;
+		if (entity.type == "player" && entity.velocity.y <= -7.0f) {
+			breakWood(gridX, gridY);
+			killRadius(entity, 2.5f * TILE_SIZE);
+		}
+		else {
+			entity.position.y += -1.0f * (entity.position.y) - gridY * TILE_SIZE + 0.001f;
+			entity.velocity.y = 0.0f;
+			entity.collidedBottom = true;
+		}
 	}
 	worldToTileCoordinates(entity.position.x + TILE_SIZE - 0.008f, entity.position.y, &gridX, &gridY);
 	if (testOutOfBounds(gridX, gridY)) {
@@ -408,10 +477,6 @@ bool entityCollision(Entity &e1, Entity &e2) {
 		e1.position.y + TILE_SIZE / 2 + top < e2.position.y - TILE_SIZE / 2));
 }
 
-float distance(double x1, double y1, double x2, double y2) {
-	return (float)sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
-}
-
 float p1ax;
 float p1ay;
 float p1vx;
@@ -444,9 +509,16 @@ void Update(float ticks, float time) {
 		else if (entities[i].type == "gear" || entities[i].type == "silverGear") {
 			entities[i].position.y += 0.001f * sin(ticks * 10.0f / PI);
 		}
-		else if (entities[i].type == "crab" && (entities[i].collidedLeft || entities[i].collidedRight)) {
-			entities[i].acceleration.x *= -1.0;
-			entities[i].velocity.y = 1.0;
+		else if (entities[i].type == "crab") {
+			if (entities[i].cliffDown);			//catches midair crabs so they don't get confused
+			else if (entities[i].collidedLeft || entities[i].cliffLeft) {
+				entities[i].acceleration.x = 0.5f;
+				entities[i].velocity.y = 1.0;
+			}
+			else if (entities[i].collidedRight || entities[i].cliffRight) {
+				entities[i].acceleration.x = -0.5f;
+				entities[i].velocity.y = 1.0;
+			}
 		}
 
 		//gravity
@@ -462,6 +534,9 @@ void Update(float ticks, float time) {
 		entities[i].collidedBottom = false;
 		entities[i].collidedLeft = false;
 		entities[i].collidedRight = false;
+		entities[i].cliffLeft = false;
+		entities[i].cliffRight = false;
+		entities[i].cliffDown = false;
 
 		entities[i].velocity.x = lerp(entities[i].velocity.x, 0.0f, time * 5);
 		entities[i].velocity.y = lerp(entities[i].velocity.y, 0.0f, time * 1);
@@ -476,6 +551,7 @@ void Update(float ticks, float time) {
 		entities[i].position.x += entities[i].velocity.x * time;
 		if (!entities[i].isStatic) {
 			collisionx(entities[i]);
+			cliffx(entities[i]);
 		}
 	}
 }
@@ -620,7 +696,7 @@ void new_game(ShaderProgram &program, const std::string &level) {
 	}
 }
 
-void game_over(ShaderProgram &program, GLuint &gameOverPage, GLuint &letters) {
+void game_over(ShaderProgram &program, GLuint &gameOverPage, GLuint &letters, std::string &level) {
 
 	int playAgainArr[] = { P, L, A, Y, -1, A, G, A, I, N };
 	int exitArr[] = { E, X, I, T };
@@ -637,7 +713,7 @@ void game_over(ShaderProgram &program, GLuint &gameOverPage, GLuint &letters) {
 			float units_y = (((float)(720 - event.motion.y) / 720) * 4.0f) - 2.0f;
 
 			if (units_x > -1.0f && units_x < 1.0f && units_y > -0.9f && units_y < -0.7f) {
-				new_game(program, "world1.txt");
+				new_game(program, level);
 				state = STATE_GAME_LEVEL;
 			}
 
@@ -734,13 +810,15 @@ int main(int argc, char *argv[])
 	glViewport(0, 0, 1280, 720);
 	ShaderProgram program(RESOURCE_FOLDER"vertex_textured.glsl", RESOURCE_FOLDER"fragment_textured.glsl");
 	float lastFrameTicks = 0.0f;
+	//std::string level = "world1.txt";
+	std::string level = "test.txt";
 	
 	GLuint controlsPage = LoadTexture("controls.png");
 	GLuint gameOverPage = LoadTexture("game_over.png");
 	GLuint letters = LoadTexture("letters.png");
 	GLuint goldenGearSpriteSheet = LoadTexture("golden_gear_spritesheet.png");
 
-	new_game(program, "world1.txt");
+	new_game(program, level);
 
 	projectionMatrix.setOrthoProjection(-3.55f, 3.55f, -2.0f, 2.0f, -1.0f, 1.0f);
 	glUseProgram(program.programID);
@@ -779,7 +857,7 @@ int main(int argc, char *argv[])
 			break;
 
 		case STATE_GAME_OVER:
-			game_over(program, gameOverPage, letters);
+			game_over(program, gameOverPage, letters, level);
 			break;
 
 		case STATE_GAME_LEVEL:
@@ -870,7 +948,7 @@ int main(int argc, char *argv[])
 							break;
 						case 12:
 							if (p1x == minx && p1y - 2 == miny) {
-								p1vy = -7.0f;
+								p1vy = -10.0f;
 							}
 							break;
 						default:
@@ -923,8 +1001,12 @@ int main(int argc, char *argv[])
 								break;
 							}
 							else if (entities[j].type == "crab" && entityCollision(entities[i], entities[j])) {
-								//entities[j].exists = false;
-								state = STATE_GAME_OVER;
+								if (entities[i].velocity.y <= -7.0f) {
+									entities[j].exists = false;
+								}
+								else {
+									state = STATE_GAME_OVER;
+								}
 								break;
 							}
 

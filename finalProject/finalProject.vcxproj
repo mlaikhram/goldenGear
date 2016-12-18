@@ -95,6 +95,7 @@
     <Image Include="letters.png" />
   </ItemGroup>
   <ItemGroup>
+    <Text Include="test.txt" />
     <Text Include="world1.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
