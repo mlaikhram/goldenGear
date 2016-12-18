@@ -429,9 +429,14 @@ Mix_Chunk *groundBreak;
 Mix_Chunk *groundSmash;
 Mix_Chunk *jump;
 
+float screenShakeValue;
+float screenShakeIntensity;
+
 void screenShake(float scale, ShaderProgram &program) {
 	//add the particle effect in here too
-	Mix_PlayChannel(-1, groundSmash, 0); //this is just for testing, remove it once its implemented
+	screenShakeIntensity = scale;
+	screenShakeValue = 0.0f;
+	Mix_PlayChannel(-1, groundBreak, 0); //this is just for testing, remove it once its implemented
 }
 
 void killRadius(Entity &entity, float r) {
@@ -459,7 +464,7 @@ void collisiony(Entity &entity, ShaderProgram &program) {
 	if (!(gridX < 0 || gridX > mapWidth || gridY < 0 || gridY > mapHeight) && levelData[gridY][gridX] < 18)
 	{
 		if (entity.type == "player" && entity.velocity.y < -1.0) {
-			screenShake(1.0f, program);
+			screenShake(entity.velocity.y / 100.0f, program);
 		}
 		if (entity.type == "player" && entity.velocity.y <= -7.0f && levelData[gridY][gridX] == 14) {
 			breakWood(gridX, gridY);
@@ -889,6 +894,9 @@ int main(int argc, char *argv[])
 	float ticks = 0.0f;
 	float fixedElapsed = 0.0f;
 
+	screenShakeValue = 0.0f;
+	screenShakeIntensity = 0.0f;
+
 	//int gearCount = 0; // ----------------------------------------
 	int gearCountArr[] = { NUM_SHIFT, NUM_SHIFT, NUM_SHIFT };
 
@@ -1054,6 +1062,11 @@ int main(int argc, char *argv[])
 			units_mx = units_x + entities[pIndex].position.x + TILE_SIZE / 2;
 			units_my = units_y + entities[pIndex].position.y + mapHeight*TILE_SIZE + TILE_SIZE / 2;
 
+			screenShakeValue += elapsed;
+			if (screenShakeValue > 0.25f) {
+				screenShakeIntensity = 0.0f;
+			}
+
 			////////ENTITY COLLISION//////////////////////////////////////////////////////////////////////////
 			for (unsigned int i = 0; i < entities.size(); ++i) {
 				if (entities[i].type == "player") {
@@ -1179,7 +1192,7 @@ int main(int argc, char *argv[])
 						DrawSpriteSheetSprite(&program, 40, 20, 10, goldenGearSpriteSheet);
 
 						viewMatrix.identity();
-						viewMatrix.Translate(-entities[i].position.x, -1 * (entities[i].position.y + mapHeight*TILE_SIZE), 0);
+						viewMatrix.Translate(-entities[i].position.x, (-1 * (entities[i].position.y + mapHeight*TILE_SIZE))  + sin(screenShakeValue * 100.0f) * screenShakeIntensity, 0);
 					}
 					else {
 						int pos = find(types.begin(), types.end(), entities[i].type) - types.begin();
