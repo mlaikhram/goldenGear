@@ -19,7 +19,7 @@
 #define RESOURCE_FOLDER "assignment1.app/Contents/Resources/"
 #endif
 
-#define PI 3.141592653589793238
+#define PI 3.141592653589793238f
 
 SDL_Window* displayWindow;
 
@@ -116,13 +116,13 @@ GLuint LoadTexture(const char *image_path)
 	return textureID;
 }
 
-float TILE_SIZE = .2;
+float TILE_SIZE = .2f;
 
 void DrawSpriteSheetSprite(ShaderProgram *program, int index, int spriteCountX, int spriteCountY, GLuint textureID) {
 	float u = (float)(((int)index) % spriteCountX) / (float)spriteCountX;
 	float v = (float)(((int)index) / spriteCountX) / (float)spriteCountY;
-	float spriteWidth = 1.0 / (float)spriteCountX;
-	float spriteHeight = 1.0 / (float)spriteCountY;
+	float spriteWidth = 1.0f / (float)spriteCountX;
+	float spriteHeight = 1.0f / (float)spriteCountY;
 
 	GLfloat texCoords[] = {
 		u, v + spriteHeight,
@@ -260,7 +260,7 @@ bool readEntityData(std::ifstream &stream) {
 }
 
 float lerp(float v0, float v1, float t) {
-	return (1.0 - t)*v0 + t*v1;
+	return (1.0f - t)*v0 + t*v1;
 }
 
 void worldToTileCoordinates(float worldX, float worldY, int *gridX, int *gridY) {
@@ -291,52 +291,52 @@ void collisionx(Entity &entity) {
 	int gridX, gridY;
 
 	//check left
-	worldToTileCoordinates(entity.position.x, entity.position.y + 0.008, &gridX, &gridY);
+	worldToTileCoordinates(entity.position.x, entity.position.y + 0.008f, &gridX, &gridY);
 	if (testOutOfBounds(gridX, gridY)) {
 		handleOOB(entity);
 		return;
 	}
 	if (!(gridX < 0 || gridX > mapWidth || gridY < 0 || gridY > mapHeight) && levelData[gridY][gridX] < 18 || (entity.type == "player" && gridY - 1 >= 0 && levelData[gridY - 1][gridX] < 18))
 	{
-		entity.position.x += 1 * (entity.position.x) - gridX * TILE_SIZE - TILE_SIZE + 0.008;
-		entity.velocity.x = 0;
+		entity.position.x += 1.0f * (entity.position.x) - gridX * TILE_SIZE - TILE_SIZE + 0.008f;
+		entity.velocity.x = 0.0f;
 		//entity.acceleration.x = 0;
 		entity.collidedLeft = true;
 	}
-	worldToTileCoordinates(entity.position.x, entity.position.y + TILE_SIZE - 0.008, &gridX, &gridY);
+	worldToTileCoordinates(entity.position.x, entity.position.y + TILE_SIZE - 0.008f, &gridX, &gridY);
 	if (testOutOfBounds(gridX, gridY)) {
 		handleOOB(entity);
 		return;
 	}
 	if (!(gridX < 0 || gridX > mapWidth || gridY < 0 || gridY > mapHeight) && levelData[gridY][gridX] < 18 || (entity.type == "player" && gridY - 1 >= 0 && levelData[gridY - 1][gridX] < 18))
 	{
-		entity.position.x += 1 * (entity.position.x) - gridX * TILE_SIZE - TILE_SIZE + 0.008;
-		entity.velocity.x = 0;
+		entity.position.x += 1.0f * (entity.position.x) - gridX * TILE_SIZE - TILE_SIZE + 0.008f;
+		entity.velocity.x = 0.0f;
 		//entity.acceleration.x = 0;
 		entity.collidedLeft = true;
 	}
 	//check right
-	worldToTileCoordinates(entity.position.x + TILE_SIZE, entity.position.y + 0.008, &gridX, &gridY);
+	worldToTileCoordinates(entity.position.x + TILE_SIZE, entity.position.y + 0.008f, &gridX, &gridY);
 	if (testOutOfBounds(gridX, gridY)) {
 		handleOOB(entity);
 		return;
 	}
 	if (!(gridX < 0 || gridX > mapWidth || gridY < 0 || gridY > mapHeight) && levelData[gridY][gridX] < 18 || (entity.type == "player" && gridY - 1 >= 0 && levelData[gridY - 1][gridX] < 18))
 	{
-		entity.position.x += 1 * (entity.position.x) - gridX * TILE_SIZE + TILE_SIZE - 0.008;
-		entity.velocity.x = 0;
+		entity.position.x += 1.0f * (entity.position.x) - gridX * TILE_SIZE + TILE_SIZE - 0.008f;
+		entity.velocity.x = 0.0f;
 		//entity.acceleration.x = 0;
 		entity.collidedRight = true;
 	}
-	worldToTileCoordinates(entity.position.x + TILE_SIZE, entity.position.y + TILE_SIZE - 0.008, &gridX, &gridY);
+	worldToTileCoordinates(entity.position.x + TILE_SIZE, entity.position.y + TILE_SIZE - 0.008f, &gridX, &gridY);
 	if (testOutOfBounds(gridX, gridY)) {
 		handleOOB(entity);
 		return;
 	}
 	if (!(gridX < 0 || gridX > mapWidth || gridY < 0 || gridY > mapHeight) && levelData[gridY][gridX] < 18 || (entity.type == "player" && gridY - 1 >= 0 && levelData[gridY - 1][gridX] < 18))
 	{
-		entity.position.x += 1 * (entity.position.x) - gridX * TILE_SIZE + TILE_SIZE - 0.008;
-		entity.velocity.x = 0;
+		entity.position.x += 1.0f * (entity.position.x) - gridX * TILE_SIZE + TILE_SIZE - 0.008f;
+		entity.velocity.x = 0.0f;
 		//entity.acceleration.x = 0;
 		entity.collidedRight = true;
 	}
@@ -344,60 +344,60 @@ void collisionx(Entity &entity) {
 
 void collisiony(Entity &entity) {
 	int gridX, gridY;
-	float top = 0;
+	float top = 0.0f;
 	if (entity.type == "player") {
 		top = TILE_SIZE;
 	}
 	//check bottom
-	worldToTileCoordinates(entity.position.x + 0.008, entity.position.y, &gridX, &gridY);
+	worldToTileCoordinates(entity.position.x + 0.008f, entity.position.y, &gridX, &gridY);
 	if (testOutOfBounds(gridX, gridY)) {
 		handleOOB(entity);
 		return;
 	}
 	if (!(gridX < 0 || gridX > mapWidth || gridY < 0 || gridY > mapHeight) && levelData[gridY][gridX] < 18)
 	{
-		entity.position.y += -1 * (entity.position.y) - gridY * TILE_SIZE + 0.001;
-		entity.velocity.y = 0;
+		entity.position.y += -1.0f * (entity.position.y) - gridY * TILE_SIZE + 0.001f;
+		entity.velocity.y = 0.0f;
 		entity.collidedBottom = true;
 	}
-	worldToTileCoordinates(entity.position.x + TILE_SIZE - 0.008, entity.position.y, &gridX, &gridY);
+	worldToTileCoordinates(entity.position.x + TILE_SIZE - 0.008f, entity.position.y, &gridX, &gridY);
 	if (testOutOfBounds(gridX, gridY)) {
 		handleOOB(entity);
 		return;
 	}
 	if (!(gridX < 0 || gridX > mapWidth || gridY < 0 || gridY > mapHeight) && levelData[gridY][gridX] < 18)
 	{
-		entity.position.y += -1 * (entity.position.y) - gridY * TILE_SIZE + 0.001;
-		entity.velocity.y = 0;
+		entity.position.y += -1.0f * (entity.position.y) - gridY * TILE_SIZE + 0.001f;
+		entity.velocity.y = 0.0f;
 		entity.collidedBottom = true;
 	}
 	//check top
-	worldToTileCoordinates(entity.position.x + 0.008, entity.position.y + TILE_SIZE + top, &gridX, &gridY);
+	worldToTileCoordinates(entity.position.x + 0.008f, entity.position.y + TILE_SIZE + top, &gridX, &gridY);
 	if (testOutOfBounds(gridX, gridY)) {
 		handleOOB(entity);
 		return;
 	}
 	if (!(gridX < 0 || gridX > mapWidth || gridY < 0 || gridY > mapHeight) && levelData[gridY][gridX] < 18)
 	{
-		entity.position.y += -1 * (entity.position.y + TILE_SIZE + top) - gridY * TILE_SIZE - TILE_SIZE - 0.001;
-		entity.velocity.y = 0;
+		entity.position.y += -1.0f * (entity.position.y + TILE_SIZE + top) - gridY * TILE_SIZE - TILE_SIZE - 0.001f;
+		entity.velocity.y = 0.0f;
 		entity.collidedTop = true;
 	}
-	worldToTileCoordinates(entity.position.x + TILE_SIZE - 0.008, entity.position.y + TILE_SIZE + top, &gridX, &gridY);
+	worldToTileCoordinates(entity.position.x + TILE_SIZE - 0.008f, entity.position.y + TILE_SIZE + top, &gridX, &gridY);
 	if (testOutOfBounds(gridX, gridY)) {
 		handleOOB(entity);
 		return;
 	}
 	if (!(gridX < 0 || gridX > mapWidth || gridY < 0 || gridY > mapHeight) && levelData[gridY][gridX] < 18)
 	{
-		entity.position.y += -1 * (entity.position.y + TILE_SIZE + top) - gridY * TILE_SIZE - TILE_SIZE - 0.001;
-		entity.velocity.y = 0;
+		entity.position.y += -1.0f * (entity.position.y + TILE_SIZE + top) - gridY * TILE_SIZE - TILE_SIZE - 0.001f;
+		entity.velocity.y = 0.0f;
 		entity.collidedTop = true;
 	}
 }
 
 bool entityCollision(Entity &e1, Entity &e2) {
-	int top = 0;
+	float top = 0.0f;
 	if (e1.type == "player") {
 		top = TILE_SIZE;
 	}
@@ -409,32 +409,55 @@ bool entityCollision(Entity &e1, Entity &e2) {
 }
 
 float distance(double x1, double y1, double x2, double y2) {
-	return sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
+	return (float)sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
 }
+
+float p1ax;
+float p1ay;
+float p1vx;
+float p1vy;
+float p1jump;
+float cooldown;
 
 #define FIXED_TIMESTEP 0.0166666f
 #define MAX_TIMESTEPS 6
-void Update(float p1ax, float p1vy, float ticks, float time) {
-	for (int i = 0; i < entities.size(); ++i) {
+void Update(float ticks, float time) {
+	for (unsigned int i = 0; i < entities.size(); ++i) {
+
 		if (entities[i].type == "player") {
 			entities[i].acceleration.x = p1ax;
+			//entities[i].acceleration.y = p1ay;
+
 			if (entities[i].collidedBottom) {
-				entities[i].velocity.y = p1vy;
+				entities[i].velocity.y += p1jump;
+				p1jump = 0.0f;
 			}
+				entities[i].velocity.x += p1vx;
+				entities[i].velocity.y += p1vy;
+				p1vy = 0.0f;
+				p1vx = 0.0f;
+
 			if (entities[i].collidedLeft || entities[i].collidedRight) {
 				entities[i].acceleration.x = 0;
 			}
 		}
 		else if (entities[i].type == "gear" || entities[i].type == "silverGear") {
-			entities[i].position.y += 0.001 * sin(ticks * 10 / PI);
+			entities[i].position.y += 0.001f * sin(ticks * 10.0f / PI);
 		}
 		else if (entities[i].type == "crab" && (entities[i].collidedLeft || entities[i].collidedRight)) {
 			entities[i].acceleration.x *= -1.0;
 			entities[i].velocity.y = 1.0;
 		}
+
+		//gravity
 		if (!entities[i].isStatic) {
-			entities[i].acceleration.y = -5;
+			entities[i].acceleration.y = -5.0f;
 		}
+
+		if (entities[i].type == "player") {
+			entities[i].acceleration.y = p1ay;
+		}
+		
 		entities[i].collidedTop = false;
 		entities[i].collidedBottom = false;
 		entities[i].collidedLeft = false;
@@ -505,7 +528,7 @@ void main_menu(ShaderProgram &program, GLuint &letters) {
 	for (int i = 0; i < 9; ++i) { // Length of playGameArr
 		if (playGameArr[i] != -1) {
 			modelMatrix.identity();
-			modelMatrix.Translate(-3.45 + i*.2 + 1.4, 0, 0);
+			modelMatrix.Translate(-3.45f + i*.2f + 1.4f, 0.0f, 0.0f);
 			program.setModelMatrix(modelMatrix);
 			program.setProjectionMatrix(projectionMatrix);
 			program.setViewMatrix(viewMatrix);
@@ -516,7 +539,7 @@ void main_menu(ShaderProgram &program, GLuint &letters) {
 	for (int i = 0; i < 8; ++i) { // Length of controlsArr
 		if (controlsArr[i] != -1) {
 			modelMatrix.identity();
-			modelMatrix.Translate(-3.45 + i*.2 + 1.4, -0.5, 0);
+			modelMatrix.Translate(-3.45f + i*.2f + 1.4f, -0.5f, 0.0f);
 			program.setModelMatrix(modelMatrix);
 			program.setProjectionMatrix(projectionMatrix);
 			program.setViewMatrix(viewMatrix);
@@ -527,7 +550,7 @@ void main_menu(ShaderProgram &program, GLuint &letters) {
 	for (int i = 0; i < 4; ++i) { // Length of exitArr
 		if (exitArr[i] != -1) {
 			modelMatrix.identity();
-			modelMatrix.Translate(-3.45 + i*.2 + 1.4, -1, 0);
+			modelMatrix.Translate(-3.45f + i*.2f + 1.4f, -1.0f, 0.0f);
 			program.setModelMatrix(modelMatrix);
 			program.setProjectionMatrix(projectionMatrix);
 			program.setViewMatrix(viewMatrix);
@@ -563,11 +586,11 @@ void controls(ShaderProgram &program, GLuint &controlsPage) {
 
 	glBindTexture(GL_TEXTURE_2D, controlsPage);
 
-	float vertices[] = { -3.55, -2.0, 3.55, -2.0, 3.55, 2.0, -3.55, -2.0, 3.55, 2.0, -3.55, 2.0 };
+	float vertices[] = { -3.55f, -2.0f, 3.55f, -2.0f, 3.55f, 2.0f, -3.55f, -2.0f, 3.55f, 2.0f, -3.55f, 2.0f };
 	glVertexAttribPointer(program.positionAttribute, 2, GL_FLOAT, false, 0, vertices);
 	glEnableVertexAttribArray(program.positionAttribute);
 
-	float texCoords[] = { 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0 };
+	float texCoords[] = { 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f };
 	glVertexAttribPointer(program.texCoordAttribute, 2, GL_FLOAT, false, 0, texCoords);
 	glEnableVertexAttribArray(program.texCoordAttribute);
 
@@ -637,7 +660,7 @@ void game_over(ShaderProgram &program, GLuint &gameOverPage, GLuint &letters) {
 
 	glBindTexture(GL_TEXTURE_2D, gameOverPage);
 
-	float vertices[] = { -3.55, -2.0, 3.55, -2.0, 3.55, 2.0, -3.55, -2.0, 3.55, 2.0, -3.55, 2.0 };
+	float vertices[] = { -3.55f, -2.0f, 3.55f, -2.0f, 3.55f, 2.0f, -3.55f, -2.0f, 3.55f, 2.0f, -3.55f, 2.0f };
 	glVertexAttribPointer(program.positionAttribute, 2, GL_FLOAT, false, 0, vertices);
 	glEnableVertexAttribArray(program.positionAttribute);
 
@@ -654,7 +677,7 @@ void game_over(ShaderProgram &program, GLuint &gameOverPage, GLuint &letters) {
 	for (int i = 0; i < 10; ++i) { // Length of playAgainArr
 		if (playAgainArr[i] != -1) {
 			modelMatrix.identity();
-			modelMatrix.Translate(-0.9 + i*.2, -0.8, 0);
+			modelMatrix.Translate(-0.9f + i*.2f, -0.8f, 0.0f);
 			program.setModelMatrix(modelMatrix);
 			program.setProjectionMatrix(projectionMatrix);
 			program.setViewMatrix(viewMatrix);
@@ -665,7 +688,7 @@ void game_over(ShaderProgram &program, GLuint &gameOverPage, GLuint &letters) {
 	for (int i = 0; i < 4; ++i) { // Length of exitArr
 		if (exitArr[i] != -1) {
 			modelMatrix.identity();
-			modelMatrix.Translate(-0.3 + i*.2, -1.3, 0);
+			modelMatrix.Translate(-0.3f + i*.2f, -1.3f, 0.0f);
 			program.setModelMatrix(modelMatrix);
 			program.setProjectionMatrix(projectionMatrix);
 			program.setViewMatrix(viewMatrix);
@@ -688,6 +711,12 @@ void level_clear() {
 	}
 	delete[] levelData;
 	gearCount = 0;
+	p1ax = 0.0f;
+	p1ay = -5.0f;
+	p1vx = 0.0f;
+	p1vy = 0.0f;
+	p1jump = 0.0f;
+	cooldown = 0.0f;
 }
 
 int main(int argc, char *argv[])
@@ -710,34 +739,28 @@ int main(int argc, char *argv[])
 	GLuint gameOverPage = LoadTexture("game_over.png");
 	GLuint letters = LoadTexture("letters.png");
 	GLuint goldenGearSpriteSheet = LoadTexture("golden_gear_spritesheet.png");
-	//GLuint spriteSheet = LoadTexture("spritesheet.png");
-	/*
-	std::ifstream world1("world1.txt");
-	std::string line;
-	while (getline(world1, line)) {
-		if (line == "[header]") {
-			if (!readHeader(world1)) {
-				return 0;
-			}
-		}
-		else if (line == "[layer]") {
-			readLayerData(world1);
-		}
-		else if (line == "[objectLayer]") {
-			readEntityData(world1);
-		}
-	}*/
+
 	new_game(program, "world1.txt");
 
-	projectionMatrix.setOrthoProjection(-3.55, 3.55, -2.0f, 2.0f, -1.0f, 1.0f);
+	projectionMatrix.setOrthoProjection(-3.55f, 3.55f, -2.0f, 2.0f, -1.0f, 1.0f);
 	glUseProgram(program.programID);
 
-	float p1vy = 0.0f;
-	float p1ax = 0.0f;
+	p1vx = 0.0f;
+	p1vy = 0.0f;
+	p1ax = 0.0f;
+	p1ay = -5.0f;
+	p1jump = 0.0f;
+	cooldown = 0.0f;
 	float units_x = 0.0f;
 	float units_y = 0.0f;
 	float units_mx = 0.0f;
 	float units_my = 0.0f;
+	double minDist = 1000000000;
+	int minx = -1;
+	int miny = -1;
+	float elapsed = 0.0f;
+	float ticks = 0.0f;
+	float fixedElapsed = 0.0f;
 
 	//int gearCount = 0; // ----------------------------------------
 	int gearCountArr[] = { NUM_SHIFT, NUM_SHIFT, NUM_SHIFT };
@@ -760,67 +783,133 @@ int main(int argc, char *argv[])
 			break;
 
 		case STATE_GAME_LEVEL:
-			p1ax = 0;
+
+			/////////////INPUT////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+			p1ax = 0.0f;
+			p1ay = -5.0f;
+
+			int p1x, p1y;
+			worldToTileCoordinates(entities[pIndex].position.x + TILE_SIZE / 2, entities[pIndex].position.y + TILE_SIZE / 2, &p1x, &p1y);
+
+			const Uint8 mouse = SDL_GetMouseState(NULL, NULL);
+			if ((mouse & SDL_BUTTON(SDL_BUTTON_LEFT)) && ((p1x == minx && p1y + 1 == miny) || ((p1y == miny || p1y - 1 == miny) && p1x + 10 >= minx) ||
+				((p1y == miny || p1y - 1 == miny) && p1x - 10 <= minx) || (p1x == minx))) {
+				switch (levelData[miny][minx]) {
+				case 9:
+					if (p1x == minx && p1y + 10 >= miny && p1y < miny) {
+						p1ay = -10.0f;
+					}
+					break;
+				case 10:
+					if ((p1y == miny || p1y - 1 == miny) && p1x + 10 >= minx && p1x < minx) {
+						p1ax = 5.0f;
+						entities[pIndex].velocity.y = 0.0f;
+						p1ay = 0.0f;
+					}
+					break;
+				case 11:
+					if ((p1y == miny || p1y - 1 == miny) && p1x - 10 <= minx && p1x > minx) {
+						p1ax = -5.0f;
+						entities[pIndex].velocity.y = 0.0f;
+						p1ay = 0.0f;
+					}
+					break;
+				case 12:
+					if (p1x == minx && p1y - 10 <= miny && p1y > miny) {
+						p1ay = 5.0f;
+					}
+					break;
+				default:
+					break;
+				}
+			}
 			const Uint8 *keys = SDL_GetKeyboardState(NULL);
 			if (keys[SDL_SCANCODE_LEFT] || keys[SDL_SCANCODE_A] || keys[SDL_SCANCODE_K]) {
-				p1ax += -5;
+				p1ax += -5.0f;
 			}
 			if (keys[SDL_SCANCODE_RIGHT] || keys[SDL_SCANCODE_D] || keys[SDL_SCANCODE_SEMICOLON]) {
-				p1ax += 5;
+				p1ax += 5.0f;
 			}
+
 			while (SDL_PollEvent(&event)) {
 				if (event.type == SDL_QUIT || event.type == SDL_WINDOWEVENT_CLOSE || event.key.keysym.scancode == SDL_SCANCODE_ESCAPE) {
 					done = true;
 				}
 				else if (event.type == SDL_KEYDOWN) {
 					if (event.key.keysym.scancode == SDL_SCANCODE_SPACE) {
-						p1vy = 3.1;
+						p1jump = 3.1f;
+						//entities[pIndex].velocity.y = 3.1f;
 					}
 				}
 				else if (event.type == SDL_KEYUP) {
 					if (event.key.keysym.scancode == SDL_SCANCODE_SPACE) {
-						p1vy = 0;
+						p1jump = 0.0f;
 					}
 				}
 				else if (event.type == SDL_MOUSEMOTION) {
 					units_x = (((float)event.motion.x / 1280) * 7.1f) - 3.55f;
 					units_y = (((float)(720 - event.motion.y) / 720) * 4.0f) - 2.0f;
 				}
-				if (event.type == SDL_MOUSEBUTTONDOWN) {
-					if (event.button.button == 1) {
-						
+				else if (event.type == SDL_MOUSEBUTTONDOWN) {
+					if (event.button.button == 3) {
+						switch (levelData[miny][minx]) {
+						case 9:
+							if (p1x == minx && p1y + 1 == miny) {
+								p1vy = 7.0f;
+							}
+							break;
+						case 10:
+							if ((p1y == miny || p1y - 1 == miny) && p1x + 1 == minx) {
+								p1vx = -14.0f;
+							}
+							break;
+						case 11:
+							if ((p1y == miny || p1y - 1 == miny) && p1x - 1 == minx) {
+								p1vx = 14.0;
+							}
+							break;
+						case 12:
+							if (p1x == minx && p1y - 2 == miny) {
+								p1vy = -7.0f;
+							}
+							break;
+						default:
+							break;
+						}
 					}
 				}
 				else if (event.type == SDL_MOUSEBUTTONUP) {
-					if (event.button.button == 1) {
-						
+					if (event.button.button == 3) {
+						p1vy = 0.0f;
+						p1vx = 0.0f;
 					}
 				}
 			}
+			
 
 			////////MOVEMENT//////////////////////////////////////////////////////////////////////////////////
 			//timestep
-			float ticks = (float)SDL_GetTicks() / 1000.0f;
-			float elapsed = ticks - lastFrameTicks;
+			ticks = (float)SDL_GetTicks() / 1000.0f;
+			elapsed = ticks - lastFrameTicks;
 			lastFrameTicks = ticks;
 
 			// 60 FPS (1.0f/60.0f)
-			float fixedElapsed = elapsed;
+			fixedElapsed = elapsed;
 			if (fixedElapsed > FIXED_TIMESTEP * MAX_TIMESTEPS) {
 				fixedElapsed = FIXED_TIMESTEP * MAX_TIMESTEPS;
 			}
 			while (fixedElapsed >= FIXED_TIMESTEP) {
 				fixedElapsed -= FIXED_TIMESTEP;
-				Update(p1ax, p1vy, ticks, FIXED_TIMESTEP);
+				Update(ticks, FIXED_TIMESTEP);
 			}
-			Update(p1ax, p1vy, ticks, fixedElapsed);
+			Update(ticks, fixedElapsed);
 			units_mx = units_x + entities[pIndex].position.x + TILE_SIZE / 2;
 			units_my = units_y + entities[pIndex].position.y + mapHeight*TILE_SIZE + TILE_SIZE / 2;
 
 			////////ENTITY COLLISION//////////////////////////////////////////////////////////////////////////
-			for (int i = 0; i < entities.size(); ++i) {
+			for (unsigned int i = 0; i < entities.size(); ++i) {
 				if (entities[i].type == "player") {
-					for (int j = 0; j < entities.size(); ++j) {
+					for (unsigned int j = 0; j < entities.size(); ++j) {
 						if (entities[j].exists) {
 
 							if (entities[j].type == "gear" && entityCollision(entities[i], entities[j])) {
@@ -848,9 +937,9 @@ int main(int argc, char *argv[])
 			///////DRAWING////////////////////////////////////////////////////////////////////////////////////
 			glClear(GL_COLOR_BUFFER_BIT);
 
-			double minDist = 1000000000;
-			int minx = -1;
-			int miny = -1;
+			minDist = 1000000000;
+			minx = -1;
+			miny = -1;
 
 			for (int y = 0; y < mapHeight; ++y) {
 				for (int x = 0; x < mapWidth; ++x) {
@@ -880,11 +969,12 @@ int main(int argc, char *argv[])
 						program.setModelMatrix(modelMatrix);
 						program.setProjectionMatrix(projectionMatrix);
 						program.setViewMatrix(viewMatrix);
-						DrawSpriteSheetSprite(&program, 27, 20, 10, goldenGearSpriteSheet);
+						DrawSpriteSheetSprite(&program, 26, 20, 10, goldenGearSpriteSheet);
 					}*/
 
 				}
 			}
+			//draw target on nearest magnet
 			if (minx >= 0 && miny >= 0) {
 				modelMatrix.identity();
 				modelMatrix.Translate(minx*TILE_SIZE, (mapHeight - miny - 1)*TILE_SIZE, 0);
@@ -894,23 +984,24 @@ int main(int argc, char *argv[])
 				program.setViewMatrix(viewMatrix);
 				DrawSpriteSheetSprite(&program, 27, 20, 10, goldenGearSpriteSheet);
 			}
+
 			/*
 			int mx;
 			int my;
 			float units_x = (((float)event.motion.x / 1280) * 7.1f) - 3.55f;
 			float units_y = (((float)(720 - event.motion.y) / 720) * 4.0f) - 2.0f;
 			worldToTileCoordinates(units_x, units_y, &mx, &my);
-
+			
 			modelMatrix.identity();
 			//modelMatrix.Translate(x*TILE_SIZE - (3.55 - TILE_SIZE/2),(32-y - 1)*TILE_SIZE - (2.0f - TILE_SIZE/2), 0);
 			modelMatrix.Translate(mx*TILE_SIZE, (mapHeight - my - 1)*TILE_SIZE, 0);
 			program.setModelMatrix(modelMatrix);
 			program.setProjectionMatrix(projectionMatrix);
 			program.setViewMatrix(viewMatrix);
-			DrawSpriteSheetSprite(&program, 27, 20, 10, goldenGearSpriteSheet);
-			*/
+			DrawSpriteSheetSprite(&program, 26, 20, 10, goldenGearSpriteSheet);*/
+			
 			std::vector<std::string> types = {"gear", "silverGear", "goldenGear", "target", "crab", "star", "bullet"};
-			for (int i = 0; i < entities.size(); ++i) {
+			for (unsigned int i = 0; i < entities.size(); ++i) {
 				if (entities[i].exists) {
 					modelMatrix.identity();
 					//modelMatrix.Translate(entities[i].position.x - 3.55 + TILE_SIZE / 2, entities[i].position.y + TILE_SIZE / 2 + (mapHeight*TILE_SIZE - 2.0f), 0);
@@ -951,7 +1042,7 @@ int main(int argc, char *argv[])
 				if (gearCountArr[i] != -1) {
 					modelMatrix.identity();
 					modelMatrix.Translate(entities[pIndex].position.x, entities[pIndex].position.y + mapHeight*TILE_SIZE, 0);
-					modelMatrix.Translate(3.0 + i*.2, 1.9, 0);
+					modelMatrix.Translate(3.0f + i*.2f, 1.9f, 0.0f);
 					program.setModelMatrix(modelMatrix);
 					program.setProjectionMatrix(projectionMatrix);
 					program.setViewMatrix(viewMatrix);

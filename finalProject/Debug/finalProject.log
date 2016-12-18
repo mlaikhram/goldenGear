@@ -1,2 +1,2 @@
-﻿MSVCRTD.lib(cinitexe.obj) : warning LNK4098: defaultlib 'msvcrt.lib' conflicts with use of other libs; use /NODEFAULTLIB:library
+﻿  main.cpp
   finalProject.vcxproj -> C:\Users\Matthew\Desktop\gitStuff\mkl\CS3113\finalProject\Debug\finalProject.exe
