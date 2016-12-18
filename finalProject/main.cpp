@@ -453,6 +453,8 @@ Mix_Chunk *groundBreak;
 Mix_Chunk *groundSmash;
 Mix_Chunk *jump;
 Mix_Chunk *landing;
+Mix_Chunk *losing;
+Mix_Chunk *winning;
 
 float screenShakeValue;
 float screenShakeIntensity;
@@ -1069,6 +1071,10 @@ int main(int argc, char *argv[])
 	Mix_VolumeChunk(jump, 50);
 	landing = Mix_LoadWAV("landing.wav");
 	Mix_VolumeChunk(landing, 50);
+	losing = Mix_LoadWAV("losing.wav");
+	Mix_VolumeChunk(losing, 100);
+	winning = Mix_LoadWAV("winning.wav");
+	Mix_VolumeChunk(winning, 10000);
 
 	Mix_Music *gameMusic;
 	gameMusic = Mix_LoadMUS("gameMusic.mp3");
@@ -1405,10 +1411,10 @@ int main(int argc, char *argv[])
 			SDL_GL_SwapWindow(displayWindow);
 			if (state == STATE_GAME_OVER || state == STATE_LEVEL_SELECT) {
 				if (state == STATE_GAME_OVER) {
-					Mix_PlayChannel(-1, magnetAttract, 0); //replace with you lose sound
+					Mix_PlayChannel(-1, losing, 0);
 				}
 				else if (state == STATE_LEVEL_SELECT) {
-					Mix_PlayChannel(-1, groundSmash, 0); //replace with you win sound
+					Mix_PlayChannel(-1, winning, 0);
 				}
 				level_clear();
 				break;
@@ -1425,6 +1431,8 @@ int main(int argc, char *argv[])
 	Mix_FreeChunk(groundSmash);
 	Mix_FreeChunk(jump);
 	Mix_FreeChunk(landing);
+	Mix_FreeChunk(losing);
+	Mix_FreeChunk(winning);
 
 	SDL_Quit();
 	return 0;

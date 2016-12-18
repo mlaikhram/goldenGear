@@ -105,9 +105,11 @@
     <Media Include="groundSmash.wav" />
     <Media Include="jump.wav" />
     <Media Include="landing.wav" />
+    <Media Include="losing.wav" />
     <Media Include="magnetAttract.wav" />
     <Media Include="magnetRepel.wav" />
     <Media Include="menuMusic.mp3" />
+    <Media Include="winning.wav" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
