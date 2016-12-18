@@ -422,6 +422,8 @@ Mix_Chunk *magnetRepel;
 Mix_Chunk *magnetAttract;
 Mix_Chunk *gearPickup;
 Mix_Chunk *groundBreak;
+Mix_Chunk *groundSmash;
+Mix_Chunk *jump;
 
 void killRadius(Entity &entity, float r) {
 	for (unsigned int i = 0; i < entities.size(); ++i) {
@@ -447,11 +449,19 @@ void collisiony(Entity &entity) {
 	}
 	if (!(gridX < 0 || gridX > mapWidth || gridY < 0 || gridY > mapHeight) && levelData[gridY][gridX] < 18)
 	{
-		if (entity.type == "player" && entity.velocity.y <= -7.0f) {
+		if (entity.type == "player" && entity.velocity.y <= -1.0f) {
+			//Mix_PlayChannel(-1, groundSmash, 0);
+			//particle dust
+			//screen shake
+		}
+		if (entity.type == "player" && entity.velocity.y <= -7.0f && levelData[gridY][gridX] == 14) {
 			breakWood(gridX, gridY);
-			killRadius(entity, 2.5f * TILE_SIZE);
 		}
 		else {
+			if (entity.type == "player" && entity.velocity.y <= -7.0f) {
+				Mix_PlayChannel(-1, groundSmash, 0);
+				killRadius(entity, 2.5f * TILE_SIZE);
+			}
 			entity.position.y += -1.0f * (entity.position.y) - gridY * TILE_SIZE + 0.001f;
 			entity.velocity.y = 0.0f;
 			entity.collidedBottom = true;
@@ -522,6 +532,9 @@ void Update(float ticks, float time) {
 			//entities[i].acceleration.y = p1ay;
 
 			if (entities[i].collidedBottom) {
+				if (p1jump != 0.0f) {
+					Mix_PlayChannel(-1, jump, 0);
+				}
 				entities[i].velocity.y += p1jump;
 				p1jump = 0.0f;
 			}
@@ -877,6 +890,8 @@ int main(int argc, char *argv[])
 	magnetAttract = Mix_LoadWAV("magnetAttract.wav");
 	gearPickup = Mix_LoadWAV("gearPickup.wav");
 	groundBreak = Mix_LoadWAV("groundBreak.wav");
+	groundSmash = Mix_LoadWAV("groundSmash.wav");
+	jump = Mix_LoadWAV("jump.wav");
 	Mix_Music *gameMusic;
 	gameMusic = Mix_LoadMUS("gameMusic.mp3");
 	Mix_PlayMusic(gameMusic, -1);
@@ -915,31 +930,30 @@ int main(int argc, char *argv[])
 				case 9:
 					if (p1x == minx && p1y + 10 >= miny && p1y < miny) {
 						p1ay = -10.0f;
+						if ((int)(ticks * 1000) % 18 == 0) Mix_PlayChannel(-1, magnetAttract, 0);
 					}
-					Mix_PlayChannel(-1, magnetAttract, 0);
 					break;
 				case 10:
 					if ((p1y == miny || p1y - 1 == miny) && p1x + 10 >= minx && p1x < minx) {
 						p1ax = 5.0f;
 						entities[pIndex].velocity.y = 0.0f;
 						p1ay = 0.0f;
+						if ((int)(ticks * 1000) % 18 == 0) Mix_PlayChannel(-1, magnetAttract, 0);
 					}
-					Mix_PlayChannel(-1, magnetAttract, 0);
 					break;
 				case 11:
 					if ((p1y == miny || p1y - 1 == miny) && p1x - 10 <= minx && p1x > minx) {
 						p1ax = -5.0f;
 						entities[pIndex].velocity.y = 0.0f;
 						p1ay = 0.0f;
+						if ((int)(ticks * 1000) % 18 == 0) Mix_PlayChannel(-1, magnetAttract, 0);
 					}
-					Mix_PlayChannel(-1, magnetAttract, 0);
 					break;
 				case 12:
 					if (p1x == minx && p1y - 10 <= miny && p1y > miny) {
 						p1ay = 5.0f;
-
+						if ((int)(ticks * 1000) % 18 == 0) Mix_PlayChannel(-1, magnetAttract, 0);
 					}
-					Mix_PlayChannel(-1, magnetAttract, 0);
 					break;
 				default:
 					break;
@@ -978,26 +992,26 @@ int main(int argc, char *argv[])
 						case 9:
 							if (p1x == minx && p1y + 1 == miny) {
 								p1vy = 7.0f;
+								Mix_PlayChannel(-1, magnetRepel, 0);
 							}
-							Mix_PlayChannel(-1, magnetRepel, 0);
 							break;
 						case 10:
 							if ((p1y == miny || p1y - 1 == miny) && p1x + 1 == minx) {
 								p1vx = -14.0f;
+								Mix_PlayChannel(-1, magnetRepel, 0);
 							}
-							Mix_PlayChannel(-1, magnetRepel, 0);
 							break;
 						case 11:
 							if ((p1y == miny || p1y - 1 == miny) && p1x - 1 == minx) {
 								p1vx = 14.0;
+								Mix_PlayChannel(-1, magnetRepel, 0);
 							}
-							Mix_PlayChannel(-1, magnetRepel, 0);
 							break;
 						case 12:
 							if (p1x == minx && p1y - 2 == miny) {
 								p1vy = -10.0f;
+								Mix_PlayChannel(-1, magnetRepel, 0);
 							}
-							Mix_PlayChannel(-1, magnetRepel, 0);
 							break;
 						default:
 							break;
@@ -1195,6 +1209,8 @@ int main(int argc, char *argv[])
 	Mix_FreeChunk(magnetAttract);
 	Mix_FreeChunk(gearPickup);
 	Mix_FreeChunk(groundBreak);
+	Mix_FreeChunk(groundSmash);
+	Mix_FreeChunk(jump);
 
 	SDL_Quit();
 	return 0;

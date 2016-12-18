@@ -102,6 +102,8 @@
     <Media Include="gameMusic.mp3" />
     <Media Include="gearPickup.wav" />
     <Media Include="groundBreak.wav" />
+    <Media Include="groundSmash.wav" />
+    <Media Include="jump.wav" />
     <Media Include="magnetAttract.wav" />
     <Media Include="magnetRepel.wav" />
     <Media Include="menuMusic.mp3" />
