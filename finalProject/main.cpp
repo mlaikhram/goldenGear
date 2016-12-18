@@ -452,6 +452,7 @@ Mix_Chunk *gearPickup;
 Mix_Chunk *groundBreak;
 Mix_Chunk *groundSmash;
 Mix_Chunk *jump;
+Mix_Chunk *landing;
 
 float screenShakeValue;
 float screenShakeIntensity;
@@ -460,7 +461,7 @@ void screenShake(float scale, ShaderProgram &program) {
 	//add the particle effect in here too
 	screenShakeIntensity = scale;
 	screenShakeValue = 0.0f;
-	Mix_PlayChannel(-1, groundBreak, 0); //this is just for testing, remove it once its implemented
+	//Mix_PlayChannel(-1, groundBreak, 0); //this is just for testing, remove it once its implemented
 }
 
 void killRadius(Entity &entity, float r) {
@@ -488,6 +489,7 @@ void collisiony(Entity &entity, ShaderProgram &program) {
 	if (!(gridX < 0 || gridX > mapWidth || gridY < 0 || gridY > mapHeight) && levelData[gridY][gridX] < 18)
 	{
 		if (entity.type == "player" && entity.velocity.y < -1.0) {
+			Mix_PlayChannel(-1, landing, 0);
 			screenShake(entity.velocity.y / 100.0f, program);
 		}
 		if (entity.type == "player" && entity.velocity.y <= -7.0f && levelData[gridY][gridX] == 14) {
@@ -1058,6 +1060,8 @@ int main(int argc, char *argv[])
 	Mix_VolumeChunk(groundSmash, 100);
 	jump = Mix_LoadWAV("jump.wav");
 	Mix_VolumeChunk(jump, 50);
+	landing = Mix_LoadWAV("landing.wav");
+	Mix_VolumeChunk(landing, 50);
 
 	Mix_Music *gameMusic;
 	gameMusic = Mix_LoadMUS("gameMusic.mp3");
@@ -1402,6 +1406,7 @@ int main(int argc, char *argv[])
 	Mix_FreeChunk(groundBreak);
 	Mix_FreeChunk(groundSmash);
 	Mix_FreeChunk(jump);
+	Mix_FreeChunk(landing);
 
 	SDL_Quit();
 	return 0;
