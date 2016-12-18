@@ -293,7 +293,7 @@ void worldToTileCoordinates(float worldX, float worldY, int *gridX, int *gridY) 
 	*gridY = (int)(-(worldY) / TILE_SIZE);
 }
 
-enum GameState { STATE_MAIN_MENU, STATE_CONTROLS, STATE_GAME_LEVEL, STATE_GAME_OVER };
+enum GameState { STATE_MAIN_MENU, STATE_LEVEL_SELECT, STATE_CONTROLS, STATE_GAME_LEVEL, STATE_GAME_OVER };
 int state = STATE_MAIN_MENU;
 
 bool testOutOfBounds(int gridX, int gridY) {
@@ -638,7 +638,8 @@ void main_menu(ShaderProgram &program, GLuint &letters) {
 			float units_y = (((float)(720 - event.motion.y) / 720) * 4.0f) - 2.0f;
 
 			if (units_x > -2.1f && units_x < -0.4f && units_y > -0.1f && units_y < 0.1f) {
-				state = STATE_GAME_LEVEL;
+				//state = STATE_GAME_LEVEL;
+				state = STATE_LEVEL_SELECT;
 			}
 
 			if (units_x > -2.1f && units_x < -0.6f && units_y > -0.6f && units_y < -0.4f) {
@@ -685,6 +686,90 @@ void main_menu(ShaderProgram &program, GLuint &letters) {
 			program.setProjectionMatrix(projectionMatrix);
 			program.setViewMatrix(viewMatrix);
 			DrawSpriteSheetSprite(&program, exitArr[i] + LETTER_SHIFT, 16, 16, letters);
+		}
+	}
+
+	SDL_GL_SwapWindow(displayWindow);
+}
+
+void level_select(ShaderProgram &program, GLuint &letters) {
+	int stageOneArr[] = { S, T, A, G, E, -1, O, N, E };
+	int stageTwoArr[] = { S, T, A, G, E, -1, T, W, O };
+	int stageThreeArr[] = { S, T, A, G, E, -1, T, H, R, E, E };
+	int backArr[] = { B, A, C, K };
+
+	while (SDL_PollEvent(&event)) {
+		if (event.type == SDL_QUIT || event.type == SDL_WINDOWEVENT_CLOSE) {
+			done = true;
+		}
+		else if (event.type == SDL_MOUSEBUTTONDOWN) { // MOUSEBUTTONDOWN
+			// Convert from pixels to OpenGL units
+			// units_x = (pixel_x / x_resolution) * ortho_width ) - ortho_width / 2.0;
+			float units_x = (((float)event.motion.x / 1280) * 7.1f) - 3.55f;
+			// units_y = ((y_resolution - pixel_y) / y_resolution) * ortho_height) - ortho_height / 2.0;
+			float units_y = (((float)(720 - event.motion.y) / 720) * 4.0f) - 2.0f;
+
+			if (units_x > -2.1f && units_x < -0.4f && units_y > -0.1f && units_y < 0.1f) {
+				state = STATE_GAME_LEVEL;
+			}
+
+			if (units_x > -2.1f && units_x < -0.4f && units_y > -0.6f && units_y < -0.4f) {
+				state = STATE_GAME_LEVEL;
+			}
+
+			if (units_x > -2.1f && units_x < 0.0f && units_y > -1.1f && units_y < -0.9f) {
+				state = STATE_GAME_LEVEL;
+			}
+
+			if (units_x > -2.1f && units_x < -1.4f && units_y > -1.6f && units_y < -1.4f) {
+				state = STATE_MAIN_MENU;
+			}
+		}
+	}
+
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	for (int i = 0; i < 9; ++i) { // Length of stageOneArr
+		if (stageOneArr[i] != -1) {
+			modelMatrix.identity();
+			modelMatrix.Translate(-3.45f + i*.2f + 1.4f, 0.0f, 0.0f);
+			program.setModelMatrix(modelMatrix);
+			program.setProjectionMatrix(projectionMatrix);
+			program.setViewMatrix(viewMatrix);
+			DrawSpriteSheetSprite(&program, stageOneArr[i] + LETTER_SHIFT, 16, 16, letters);
+		}
+	}
+
+	for (int i = 0; i < 9; ++i) { // Length of stageTwoArr
+		if (stageTwoArr[i] != -1) {
+			modelMatrix.identity();
+			modelMatrix.Translate(-3.45f + i*.2f + 1.4f, -0.5f, 0.0f);
+			program.setModelMatrix(modelMatrix);
+			program.setProjectionMatrix(projectionMatrix);
+			program.setViewMatrix(viewMatrix);
+			DrawSpriteSheetSprite(&program, stageTwoArr[i] + LETTER_SHIFT, 16, 16, letters);
+		}
+	}
+
+	for (int i = 0; i < 11; ++i) { // Length of stageThreeArr
+		if (stageThreeArr[i] != -1) {
+			modelMatrix.identity();
+			modelMatrix.Translate(-3.45f + i*.2f + 1.4f, -1.0f, 0.0f);
+			program.setModelMatrix(modelMatrix);
+			program.setProjectionMatrix(projectionMatrix);
+			program.setViewMatrix(viewMatrix);
+			DrawSpriteSheetSprite(&program, stageThreeArr[i] + LETTER_SHIFT, 16, 16, letters);
+		}
+	}
+
+	for (int i = 0; i < 4; ++i) { // Length of backArr
+		if (backArr[i] != -1) {
+			modelMatrix.identity();
+			modelMatrix.Translate(-3.45f + i*.2f + 1.4f, -1.5f, 0.0f);
+			program.setModelMatrix(modelMatrix);
+			program.setProjectionMatrix(projectionMatrix);
+			program.setViewMatrix(viewMatrix);
+			DrawSpriteSheetSprite(&program, backArr[i] + LETTER_SHIFT, 16, 16, letters);
 		}
 	}
 
@@ -772,7 +857,7 @@ void game_over(ShaderProgram &program, GLuint &gameOverPage, GLuint &letters, st
 			}
 
 			if (units_x > -0.4f && units_x < 0.3f && units_y > -1.4f && units_y < -1.2f) {
-				done = true;
+				state = STATE_MAIN_MENU;
 			}
 		}
 	}
@@ -920,6 +1005,10 @@ int main(int argc, char *argv[])
 
 		case STATE_MAIN_MENU:
 			main_menu(program, letters);
+			break;
+
+		case STATE_LEVEL_SELECT:
+			level_select(program, letters);
 			break;
 
 		case STATE_CONTROLS:
