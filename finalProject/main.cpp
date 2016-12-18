@@ -498,7 +498,7 @@ void collisiony(Entity &entity, ShaderProgram &program) {
 		else {
 			if (entity.type == "player" && entity.velocity.y <= -7.0f) {
 				Mix_PlayChannel(-1, groundSmash, 0);
-				killRadius(entity, 2.5f * TILE_SIZE);
+				killRadius(entity, 3.5f * TILE_SIZE);
 			}
 			entity.position.y += -1.0f * (entity.position.y) - gridY * TILE_SIZE + 0.001f;
 			entity.velocity.y = 0.0f;
@@ -823,6 +823,13 @@ void level_select(ShaderProgram &program, GLuint &letters) {
 
 	glClear(GL_COLOR_BUFFER_BIT);
 
+	viewMatrix.identity();
+	modelMatrix.identity();
+
+	program.setModelMatrix(modelMatrix);
+	program.setProjectionMatrix(projectionMatrix);
+	program.setViewMatrix(viewMatrix);
+
 	for (int i = 0; i < 9; ++i) { // Length of stageOneArr
 		if (stageOneArr[i] != -1) {
 			modelMatrix.identity();
@@ -1144,6 +1151,11 @@ int main(int argc, char *argv[])
 						if ((int)(ticks * 1000) % 18 == 0) Mix_PlayChannel(-1, magnetAttract, 0);
 					}
 					break;
+				case 22:
+					if (p1x == minx && p1y - 1 == miny) {
+						state = STATE_LEVEL_SELECT;
+					}
+					break;
 				default:
 					break;
 				}
@@ -1296,7 +1308,7 @@ int main(int argc, char *argv[])
 					worldToTileCoordinates(units_mx, units_my, &mx, &my);
 					my = my + mapHeight - 1;
 
-					if (levelData[y][x] >= 9 && levelData[y][x] <= 12 && distance(mx, my, x, y) < minDist) {
+					if (((levelData[y][x] >= 9 && levelData[y][x] <= 12) || levelData[y][x] == 22) && distance(mx, my, x, y) < minDist) {
 						minDist = distance(mx, my, x, y);
 						minx = x;
 						miny = y;					
@@ -1391,7 +1403,13 @@ int main(int argc, char *argv[])
 			}
 
 			SDL_GL_SwapWindow(displayWindow);
-			if (state == STATE_GAME_OVER) {
+			if (state == STATE_GAME_OVER || state == STATE_LEVEL_SELECT) {
+				if (state == STATE_GAME_OVER) {
+					Mix_PlayChannel(-1, magnetAttract, 0); //replace with you lose sound
+				}
+				else if (state == STATE_LEVEL_SELECT) {
+					Mix_PlayChannel(-1, groundSmash, 0); //replace with you win sound
+				}
 				level_clear();
 				break;
 			}
