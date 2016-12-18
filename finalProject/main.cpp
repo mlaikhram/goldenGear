@@ -692,90 +692,6 @@ void main_menu(ShaderProgram &program, GLuint &letters) {
 	SDL_GL_SwapWindow(displayWindow);
 }
 
-void level_select(ShaderProgram &program, GLuint &letters) {
-	int stageOneArr[] = { S, T, A, G, E, -1, O, N, E };
-	int stageTwoArr[] = { S, T, A, G, E, -1, T, W, O };
-	int stageThreeArr[] = { S, T, A, G, E, -1, T, H, R, E, E };
-	int backArr[] = { B, A, C, K };
-
-	while (SDL_PollEvent(&event)) {
-		if (event.type == SDL_QUIT || event.type == SDL_WINDOWEVENT_CLOSE) {
-			done = true;
-		}
-		else if (event.type == SDL_MOUSEBUTTONDOWN) { // MOUSEBUTTONDOWN
-			// Convert from pixels to OpenGL units
-			// units_x = (pixel_x / x_resolution) * ortho_width ) - ortho_width / 2.0;
-			float units_x = (((float)event.motion.x / 1280) * 7.1f) - 3.55f;
-			// units_y = ((y_resolution - pixel_y) / y_resolution) * ortho_height) - ortho_height / 2.0;
-			float units_y = (((float)(720 - event.motion.y) / 720) * 4.0f) - 2.0f;
-
-			if (units_x > -2.1f && units_x < -0.4f && units_y > -0.1f && units_y < 0.1f) {
-				state = STATE_GAME_LEVEL;
-			}
-
-			if (units_x > -2.1f && units_x < -0.4f && units_y > -0.6f && units_y < -0.4f) {
-				state = STATE_GAME_LEVEL;
-			}
-
-			if (units_x > -2.1f && units_x < 0.0f && units_y > -1.1f && units_y < -0.9f) {
-				state = STATE_GAME_LEVEL;
-			}
-
-			if (units_x > -2.1f && units_x < -1.4f && units_y > -1.6f && units_y < -1.4f) {
-				state = STATE_MAIN_MENU;
-			}
-		}
-	}
-
-	glClear(GL_COLOR_BUFFER_BIT);
-
-	for (int i = 0; i < 9; ++i) { // Length of stageOneArr
-		if (stageOneArr[i] != -1) {
-			modelMatrix.identity();
-			modelMatrix.Translate(-3.45f + i*.2f + 1.4f, 0.0f, 0.0f);
-			program.setModelMatrix(modelMatrix);
-			program.setProjectionMatrix(projectionMatrix);
-			program.setViewMatrix(viewMatrix);
-			DrawSpriteSheetSprite(&program, stageOneArr[i] + LETTER_SHIFT, 16, 16, letters);
-		}
-	}
-
-	for (int i = 0; i < 9; ++i) { // Length of stageTwoArr
-		if (stageTwoArr[i] != -1) {
-			modelMatrix.identity();
-			modelMatrix.Translate(-3.45f + i*.2f + 1.4f, -0.5f, 0.0f);
-			program.setModelMatrix(modelMatrix);
-			program.setProjectionMatrix(projectionMatrix);
-			program.setViewMatrix(viewMatrix);
-			DrawSpriteSheetSprite(&program, stageTwoArr[i] + LETTER_SHIFT, 16, 16, letters);
-		}
-	}
-
-	for (int i = 0; i < 11; ++i) { // Length of stageThreeArr
-		if (stageThreeArr[i] != -1) {
-			modelMatrix.identity();
-			modelMatrix.Translate(-3.45f + i*.2f + 1.4f, -1.0f, 0.0f);
-			program.setModelMatrix(modelMatrix);
-			program.setProjectionMatrix(projectionMatrix);
-			program.setViewMatrix(viewMatrix);
-			DrawSpriteSheetSprite(&program, stageThreeArr[i] + LETTER_SHIFT, 16, 16, letters);
-		}
-	}
-
-	for (int i = 0; i < 4; ++i) { // Length of backArr
-		if (backArr[i] != -1) {
-			modelMatrix.identity();
-			modelMatrix.Translate(-3.45f + i*.2f + 1.4f, -1.5f, 0.0f);
-			program.setModelMatrix(modelMatrix);
-			program.setProjectionMatrix(projectionMatrix);
-			program.setViewMatrix(viewMatrix);
-			DrawSpriteSheetSprite(&program, backArr[i] + LETTER_SHIFT, 16, 16, letters);
-		}
-	}
-
-	SDL_GL_SwapWindow(displayWindow);
-}
-
 void controls(ShaderProgram &program, GLuint &controlsPage) {
 
 	while (SDL_PollEvent(&event)) {
@@ -833,6 +749,96 @@ void new_game(ShaderProgram &program, const std::string &level) {
 			readEntityData(world);
 		}
 	}
+}
+
+std::string level;
+
+void level_select(ShaderProgram &program, GLuint &letters) {
+	int stageOneArr[] = { S, T, A, G, E, -1, O, N, E };
+	int stageTwoArr[] = { S, T, A, G, E, -1, T, W, O };
+	int stageThreeArr[] = { S, T, A, G, E, -1, T, H, R, E, E };
+	int backArr[] = { B, A, C, K };
+
+	while (SDL_PollEvent(&event)) {
+		if (event.type == SDL_QUIT || event.type == SDL_WINDOWEVENT_CLOSE) {
+			done = true;
+		}
+		else if (event.type == SDL_MOUSEBUTTONDOWN) { // MOUSEBUTTONDOWN
+													  // Convert from pixels to OpenGL units
+													  // units_x = (pixel_x / x_resolution) * ortho_width ) - ortho_width / 2.0;
+			float units_x = (((float)event.motion.x / 1280) * 7.1f) - 3.55f;
+			// units_y = ((y_resolution - pixel_y) / y_resolution) * ortho_height) - ortho_height / 2.0;
+			float units_y = (((float)(720 - event.motion.y) / 720) * 4.0f) - 2.0f;
+
+			if (units_x > -2.1f && units_x < -0.4f && units_y > -0.1f && units_y < 0.1f) {
+				level = "world1.txt";
+				state = STATE_GAME_LEVEL;
+			}
+
+			if (units_x > -2.1f && units_x < -0.4f && units_y > -0.6f && units_y < -0.4f) {
+				level = "test.txt";
+				state = STATE_GAME_LEVEL;
+			}
+
+			if (units_x > -2.1f && units_x < 0.0f && units_y > -1.1f && units_y < -0.9f) {
+				level = "world1.txt";
+				state = STATE_GAME_LEVEL;
+			}
+
+			if (units_x > -2.1f && units_x < -1.4f && units_y > -1.6f && units_y < -1.4f) {
+				state = STATE_MAIN_MENU;
+			}
+		}
+		new_game(program, level);
+	}
+
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	for (int i = 0; i < 9; ++i) { // Length of stageOneArr
+		if (stageOneArr[i] != -1) {
+			modelMatrix.identity();
+			modelMatrix.Translate(-3.45f + i*.2f + 1.4f, 0.0f, 0.0f);
+			program.setModelMatrix(modelMatrix);
+			program.setProjectionMatrix(projectionMatrix);
+			program.setViewMatrix(viewMatrix);
+			DrawSpriteSheetSprite(&program, stageOneArr[i] + LETTER_SHIFT, 16, 16, letters);
+		}
+	}
+
+	for (int i = 0; i < 9; ++i) { // Length of stageTwoArr
+		if (stageTwoArr[i] != -1) {
+			modelMatrix.identity();
+			modelMatrix.Translate(-3.45f + i*.2f + 1.4f, -0.5f, 0.0f);
+			program.setModelMatrix(modelMatrix);
+			program.setProjectionMatrix(projectionMatrix);
+			program.setViewMatrix(viewMatrix);
+			DrawSpriteSheetSprite(&program, stageTwoArr[i] + LETTER_SHIFT, 16, 16, letters);
+		}
+	}
+
+	for (int i = 0; i < 11; ++i) { // Length of stageThreeArr
+		if (stageThreeArr[i] != -1) {
+			modelMatrix.identity();
+			modelMatrix.Translate(-3.45f + i*.2f + 1.4f, -1.0f, 0.0f);
+			program.setModelMatrix(modelMatrix);
+			program.setProjectionMatrix(projectionMatrix);
+			program.setViewMatrix(viewMatrix);
+			DrawSpriteSheetSprite(&program, stageThreeArr[i] + LETTER_SHIFT, 16, 16, letters);
+		}
+	}
+
+	for (int i = 0; i < 4; ++i) { // Length of backArr
+		if (backArr[i] != -1) {
+			modelMatrix.identity();
+			modelMatrix.Translate(-3.45f + i*.2f + 1.4f, -1.5f, 0.0f);
+			program.setModelMatrix(modelMatrix);
+			program.setProjectionMatrix(projectionMatrix);
+			program.setViewMatrix(viewMatrix);
+			DrawSpriteSheetSprite(&program, backArr[i] + LETTER_SHIFT, 16, 16, letters);
+		}
+	}
+
+	SDL_GL_SwapWindow(displayWindow);
 }
 
 void game_over(ShaderProgram &program, GLuint &gameOverPage, GLuint &letters, std::string &level) {
@@ -916,8 +922,21 @@ void game_over(ShaderProgram &program, GLuint &gameOverPage, GLuint &letters, st
 	SDL_GL_SwapWindow(displayWindow);
 }
 
+
+float units_x = 0.0f;
+float units_y = 0.0f;
+float units_mx = 0.0f;
+float units_my = 0.0f;
+double minDist = 1000000000;
+int minx = -1;
+int miny = -1;
+float elapsed = 0.0f;
+float lastFrameTicks = 0.0f;
+float ticks = 0.0f;
+float fixedElapsed = 0.0f;
 int gearCount = 0;
 int NUM_SHIFT = 48;
+
 void level_clear() {
 	//empty the level
 	entities.clear();
@@ -926,12 +945,27 @@ void level_clear() {
 	}
 	delete[] levelData;
 	gearCount = 0;
-	p1ax = 0.0f;
-	p1ay = -5.0f;
 	p1vx = 0.0f;
 	p1vy = 0.0f;
+	p1ax = 0.0f;
+	p1ay = -5.0f;
 	p1jump = 0.0f;
 	cooldown = 0.0f;
+	units_x = 0.0f;
+	units_y = 0.0f;
+	units_mx = 0.0f;
+	units_my = 0.0f;
+	minDist = 1000000000;
+	minx = -1;
+	miny = -1;
+	elapsed = 0.0f;
+	lastFrameTicks = 0.0f;
+	ticks = 0.0f;
+	fixedElapsed = 0.0f;
+
+	screenShakeValue = 0.0f;
+	screenShakeIntensity = 0.0f;
+
 }
 
 int main(int argc, char *argv[])
@@ -948,16 +982,13 @@ int main(int argc, char *argv[])
 	//glViewport(0, 0, 640, 360);
 	glViewport(0, 0, 1280, 720);
 	ShaderProgram program(RESOURCE_FOLDER"vertex_textured.glsl", RESOURCE_FOLDER"fragment_textured.glsl");
-	float lastFrameTicks = 0.0f;
-	//std::string level = "world1.txt";
-	std::string level = "test.txt";
 	
 	GLuint controlsPage = LoadTexture("controls.png");
 	GLuint gameOverPage = LoadTexture("game_over.png");
 	GLuint letters = LoadTexture("letters.png");
 	GLuint goldenGearSpriteSheet = LoadTexture("golden_gear_spritesheet.png");
 
-	new_game(program, level);
+	//new_game(program, level);
 
 	projectionMatrix.setOrthoProjection(-3.55f, 3.55f, -2.0f, 2.0f, -1.0f, 1.0f);
 	glUseProgram(program.programID);
@@ -968,16 +999,17 @@ int main(int argc, char *argv[])
 	p1ay = -5.0f;
 	p1jump = 0.0f;
 	cooldown = 0.0f;
-	float units_x = 0.0f;
-	float units_y = 0.0f;
-	float units_mx = 0.0f;
-	float units_my = 0.0f;
-	double minDist = 1000000000;
-	int minx = -1;
-	int miny = -1;
-	float elapsed = 0.0f;
-	float ticks = 0.0f;
-	float fixedElapsed = 0.0f;
+	units_x = 0.0f;
+	units_y = 0.0f;
+	units_mx = 0.0f;
+	units_my = 0.0f;
+	minDist = 1000000000;
+	minx = -1;
+	miny = -1;
+	elapsed = 0.0f;
+	lastFrameTicks = 0.0f;
+	ticks = 0.0f;
+	fixedElapsed = 0.0f;
 
 	screenShakeValue = 0.0f;
 	screenShakeIntensity = 0.0f;
@@ -1307,9 +1339,10 @@ int main(int argc, char *argv[])
 			}
 
 			SDL_GL_SwapWindow(displayWindow);
-			if (state == STATE_GAME_OVER)
+			if (state == STATE_GAME_OVER) {
 				level_clear();
-			break;
+				break;
+			}
 		}
 	}
 
