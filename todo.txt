@@ -8,16 +8,16 @@ Add character and enemy animations
 Add particle effects on active magnets and breaking wooden floors
 
 Audio:
-Add background music
-Add sound effects
+//Add background music
+Add sound effects --can keep adding more
 
 Mechanical:
 Add nearest enemy snapping for targets (based on mouse position)
-Add crab functionality
+Add crab functionality --shooting would be nice
 Add star functionality
 
 General:
-Add level select menu
+//Add level select menu
 Add death scenes
 Add more levels
 Add boss fight

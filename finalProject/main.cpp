@@ -749,6 +749,7 @@ void new_game(ShaderProgram &program, const std::string &level) {
 			readEntityData(world);
 		}
 	}
+	world.close();
 }
 
 std::string level;
@@ -772,24 +773,26 @@ void level_select(ShaderProgram &program, GLuint &letters) {
 
 			if (units_x > -2.1f && units_x < -0.4f && units_y > -0.1f && units_y < 0.1f) {
 				level = "world1.txt";
+				new_game(program, level);
 				state = STATE_GAME_LEVEL;
 			}
 
-			if (units_x > -2.1f && units_x < -0.4f && units_y > -0.6f && units_y < -0.4f) {
+			else if (units_x > -2.1f && units_x < -0.4f && units_y > -0.6f && units_y < -0.4f) {
 				level = "test.txt";
+				new_game(program, level);
 				state = STATE_GAME_LEVEL;
 			}
 
-			if (units_x > -2.1f && units_x < 0.0f && units_y > -1.1f && units_y < -0.9f) {
+			else if (units_x > -2.1f && units_x < 0.0f && units_y > -1.1f && units_y < -0.9f) {
 				level = "world1.txt";
+				new_game(program, level);
 				state = STATE_GAME_LEVEL;
 			}
 
-			if (units_x > -2.1f && units_x < -1.4f && units_y > -1.6f && units_y < -1.4f) {
+			else if (units_x > -2.1f && units_x < -1.4f && units_y > -1.6f && units_y < -1.4f) {
 				state = STATE_MAIN_MENU;
 			}
 		}
-		new_game(program, level);
 	}
 
 	glClear(GL_COLOR_BUFFER_BIT);
