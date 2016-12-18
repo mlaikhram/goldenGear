@@ -1189,6 +1189,13 @@ int main(int argc, char *argv[])
 		}
 	}
 
+	// Free music/sounds
+	Mix_FreeMusic(gameMusic);
+	Mix_FreeChunk(magnetRepel);
+	Mix_FreeChunk(magnetAttract);
+	Mix_FreeChunk(gearPickup);
+	Mix_FreeChunk(groundBreak);
+
 	SDL_Quit();
 	return 0;
 }
