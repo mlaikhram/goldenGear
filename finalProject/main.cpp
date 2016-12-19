@@ -1384,7 +1384,7 @@ int main(int argc, char *argv[])
 						DrawSpriteSheetSprite(&program, 60, 20, 10, goldenGearSpriteSheet);
 
 						modelMatrix.identity();
-						modelMatrix.Translate(entities[i].position.x, entities[i].position.y + mapHeight*TILE_SIZE + TILE_SIZE + bobbing * sin(ticks * 100.0f * PI) - 0.01f, 0);
+						modelMatrix.Translate(entities[i].position.x, entities[i].position.y + mapHeight*TILE_SIZE + TILE_SIZE + bobbing * sin(ticks * 10.0f * PI) - 0.01f, 0);
 
 						program.setModelMatrix(modelMatrix);
 						program.setProjectionMatrix(projectionMatrix);
