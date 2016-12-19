@@ -383,7 +383,7 @@ void collisionx(Entity &entity, ShaderProgram &program) {
 		handleOOB(entity);
 		return;
 	}
-	if (!(gridX < 0 || gridX > mapWidth || gridY < 0 || gridY > mapHeight) && levelData[gridY][gridX] < 18 || (entity.type == "player" && gridY - 1 >= 0 && levelData[gridY - 1][gridX] < 18))
+	if (!(gridX < 0 || gridX > mapWidth || gridY < 0 || gridY > mapHeight) && levelData[gridY][gridX] < 18)
 	{
 		entity.position.x += 1.0f * (entity.position.x) - gridX * TILE_SIZE - TILE_SIZE + 0.008f;
 		entity.velocity.x = 0.0f;
@@ -395,7 +395,7 @@ void collisionx(Entity &entity, ShaderProgram &program) {
 		handleOOB(entity);
 		return;
 	}
-	if (!(gridX < 0 || gridX > mapWidth || gridY < 0 || gridY > mapHeight) && levelData[gridY][gridX] < 18 || (entity.type == "player" && gridY - 1 >= 0 && levelData[gridY - 1][gridX] < 18))
+	if (!(gridX < 0 || gridX > mapWidth || gridY < 0 || gridY > mapHeight) && levelData[gridY][gridX] < 18)
 	{
 		entity.position.x += 1.0f * (entity.position.x) - gridX * TILE_SIZE - TILE_SIZE + 0.008f;
 		entity.velocity.x = 0.0f;
@@ -408,7 +408,7 @@ void collisionx(Entity &entity, ShaderProgram &program) {
 		handleOOB(entity);
 		return;
 	}
-	if (!(gridX < 0 || gridX > mapWidth || gridY < 0 || gridY > mapHeight) && levelData[gridY][gridX] < 18 || (entity.type == "player" && gridY - 1 >= 0 && levelData[gridY - 1][gridX] < 18))
+	if (!(gridX < 0 || gridX > mapWidth || gridY < 0 || gridY > mapHeight) && levelData[gridY][gridX] < 18)
 	{
 		entity.position.x += 1.0f * (entity.position.x) - gridX * TILE_SIZE + TILE_SIZE - 0.008f;
 		entity.velocity.x = 0.0f;
@@ -420,12 +420,66 @@ void collisionx(Entity &entity, ShaderProgram &program) {
 		handleOOB(entity);
 		return;
 	}
-	if (!(gridX < 0 || gridX > mapWidth || gridY < 0 || gridY > mapHeight) && levelData[gridY][gridX] < 18 || (entity.type == "player" && gridY - 1 >= 0 && levelData[gridY - 1][gridX] < 18))
+	if (!(gridX < 0 || gridX > mapWidth || gridY < 0 || gridY > mapHeight) && levelData[gridY][gridX] < 18)
 	{
 		entity.position.x += 1.0f * (entity.position.x) - gridX * TILE_SIZE + TILE_SIZE - 0.008f;
 		entity.velocity.x = 0.0f;
 		//entity.acceleration.x = 0;
 		entity.collidedRight = true;
+	}
+
+	//check top half of player
+	if (entity.type == "player") {
+		//check left
+		worldToTileCoordinates(entity.position.x, entity.position.y + TILE_SIZE + 0.008f, &gridX, &gridY);
+		if (testOutOfBounds(gridX, gridY)) {
+			handleOOB(entity);
+			return;
+		}
+		if (!(gridX < 0 || gridX > mapWidth || gridY < 0 || gridY > mapHeight) && levelData[gridY][gridX] < 18)
+		{
+			entity.position.x += 1.0f * (entity.position.x) - gridX * TILE_SIZE - TILE_SIZE + 0.008f;
+			entity.velocity.x = 0.0f;
+			//entity.acceleration.x = 0;
+			entity.collidedLeft = true;
+		}
+		worldToTileCoordinates(entity.position.x, entity.position.y + TILE_SIZE + TILE_SIZE - 0.008f, &gridX, &gridY);
+		if (testOutOfBounds(gridX, gridY)) {
+			handleOOB(entity);
+			return;
+		}
+		if (!(gridX < 0 || gridX > mapWidth || gridY < 0 || gridY > mapHeight) && levelData[gridY][gridX] < 18)
+		{
+			entity.position.x += 1.0f * (entity.position.x) - gridX * TILE_SIZE - TILE_SIZE + 0.008f;
+			entity.velocity.x = 0.0f;
+			//entity.acceleration.x = 0;
+			entity.collidedLeft = true;
+		}
+		//check right
+		worldToTileCoordinates(entity.position.x + TILE_SIZE, entity.position.y + TILE_SIZE + 0.008f, &gridX, &gridY);
+		if (testOutOfBounds(gridX, gridY)) {
+			handleOOB(entity);
+			return;
+		}
+		if (!(gridX < 0 || gridX > mapWidth || gridY < 0 || gridY > mapHeight) && levelData[gridY][gridX] < 18)
+		{
+			entity.position.x += 1.0f * (entity.position.x) - gridX * TILE_SIZE + TILE_SIZE - 0.008f;
+			entity.velocity.x = 0.0f;
+			//entity.acceleration.x = 0;
+			entity.collidedRight = true;
+		}
+		worldToTileCoordinates(entity.position.x + TILE_SIZE, entity.position.y + TILE_SIZE + TILE_SIZE - 0.008f, &gridX, &gridY);
+		if (testOutOfBounds(gridX, gridY)) {
+			handleOOB(entity);
+			return;
+		}
+		if (!(gridX < 0 || gridX > mapWidth || gridY < 0 || gridY > mapHeight) && levelData[gridY][gridX] < 18)
+		{
+			entity.position.x += 1.0f * (entity.position.x) - gridX * TILE_SIZE + TILE_SIZE - 0.008f;
+			entity.velocity.x = 0.0f;
+			//entity.acceleration.x = 0;
+			entity.collidedRight = true;
+		}
 	}
 }
 
@@ -472,7 +526,6 @@ void killRadius(Entity &entity, float r) {
 			entities[i].exists = false;
 		}
 	}
-	Mix_PlayChannel(-1, groundBreak, 0);
 }
 
 void collisiony(Entity &entity, ShaderProgram &program) {
@@ -494,6 +547,8 @@ void collisiony(Entity &entity, ShaderProgram &program) {
 			screenShake(entity.velocity.y / 100.0f, program);
 		}
 		if (entity.type == "player" && entity.velocity.y <= -7.0f && levelData[gridY][gridX] == 14) {
+			killRadius(entity, 4.0f * TILE_SIZE);
+			Mix_PlayChannel(-1, groundBreak, 0);
 			breakWood(gridX, gridY);
 		}
 		else {
@@ -561,8 +616,8 @@ float p1vy;
 float p1jump;
 float cooldown;
 
-#define FIXED_TIMESTEP 0.0166666f
-#define MAX_TIMESTEPS 6
+#define FIXED_TIMESTEP 0.0066666f
+#define MAX_TIMESTEPS 12
 void Update(float ticks, float time, ShaderProgram &program, ParticleEmitter &part, float &fixedElapsed) {
 	for (int i = 0; i < part.particles.size(); ++i) {
 		part.particles[i].position.x = entities[pIndex].position.x + fixedElapsed * part.particles[i].velocity.x;

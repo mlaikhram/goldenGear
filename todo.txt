@@ -1,6 +1,5 @@
 Bugfixes:
-//Fix timestep
-//Fix left/right hitboxes
+NONE!?
 
 Sprites/Visual:
 Add character and enemy animations
