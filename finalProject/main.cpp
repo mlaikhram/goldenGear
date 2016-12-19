@@ -619,7 +619,7 @@ float cooldown;
 #define FIXED_TIMESTEP 0.0066666f
 #define MAX_TIMESTEPS 12
 void Update(float ticks, float time, ShaderProgram &program, ParticleEmitter &part, float &fixedElapsed) {
-	for (int i = 0; i < part.particles.size(); ++i) {
+	for (int i = 0; i < part.particles.size(); ++i) { 
 		part.particles[i].position.x = entities[pIndex].position.x + fixedElapsed * part.particles[i].velocity.x;
 		part.particles[i].position.y = entities[pIndex].position.y + fixedElapsed * part.particles[i].velocity.y;
 	}
@@ -727,21 +727,25 @@ void main_menu(ShaderProgram &program, GLuint &letters) {
 			if (units_x > -2.1f && units_x < -0.4f && units_y > -0.1f && units_y < 0.1f) {
 				//state = STATE_GAME_LEVEL;
 				state = STATE_LEVEL_SELECT;
+				Mix_PlayChannel(-1, gearPickup, 0);
 			}
 
 			if (units_x > -2.1f && units_x < -0.6f && units_y > -0.6f && units_y < -0.4f) {
 				state = STATE_CONTROLS;
 				//state = STATE_GAME_LEVEL;
+				Mix_PlayChannel(-1, gearPickup, 0);
 			}
 
 			if (units_x > -2.1f && units_x < -1.4f && units_y > -1.1f && units_y < -0.9f) {
 				/*SDL_Quit();
 				return 0;*/
+				Mix_PlayChannel(-1, gearPickup, 0);
 				done = true;
 			}
 		}
 	}
 	glClear(GL_COLOR_BUFFER_BIT);
+	glEnable(GL_BLEND);
 
 	for (int i = 0; i < 9; ++i) { // Length of playGameArr
 		if (playGameArr[i] != -1) {
@@ -788,11 +792,13 @@ void controls(ShaderProgram &program, GLuint &controlsPage) {
 		else if (event.type == SDL_KEYDOWN) {
 			if (event.key.keysym.scancode == SDL_SCANCODE_ESCAPE) {
 				state = STATE_MAIN_MENU;
+				Mix_PlayChannel(-1, gearPickup, 0);
 			}
 		}
 	}
 
 	glClear(GL_COLOR_BUFFER_BIT);
+	glEnable(GL_BLEND);
 
 	program.setModelMatrix(modelMatrix);
 	program.setProjectionMatrix(projectionMatrix);
@@ -862,27 +868,32 @@ void level_select(ShaderProgram &program, GLuint &letters) {
 				level = "world1.txt";
 				new_game(program, level);
 				state = STATE_GAME_LEVEL;
+				Mix_PlayChannel(-1, gearPickup, 0);
 			}
 
 			else if (units_x > -2.1f && units_x < -0.4f && units_y > -0.6f && units_y < -0.4f) {
 				level = "test.txt";
 				new_game(program, level);
 				state = STATE_GAME_LEVEL;
+				Mix_PlayChannel(-1, gearPickup, 0);
 			}
 
 			else if (units_x > -2.1f && units_x < 0.0f && units_y > -1.1f && units_y < -0.9f) {
 				level = "world1.txt";
 				new_game(program, level);
 				state = STATE_GAME_LEVEL;
+				Mix_PlayChannel(-1, gearPickup, 0);
 			}
 
 			else if (units_x > -2.1f && units_x < -1.4f && units_y > -1.6f && units_y < -1.4f) {
 				state = STATE_MAIN_MENU;
+				Mix_PlayChannel(-1, gearPickup, 0);
 			}
 		}
 	}
 
 	glClear(GL_COLOR_BUFFER_BIT);
+	glEnable(GL_BLEND);
 
 	viewMatrix.identity();
 	modelMatrix.identity();
@@ -957,15 +968,19 @@ void game_over(ShaderProgram &program, GLuint &gameOverPage, GLuint &letters, st
 			if (units_x > -1.0f && units_x < 1.0f && units_y > -0.9f && units_y < -0.7f) {
 				new_game(program, level);
 				state = STATE_GAME_LEVEL;
+				Mix_PlayChannel(-1, gearPickup, 0);
 			}
 
 			if (units_x > -0.4f && units_x < 0.3f && units_y > -1.4f && units_y < -1.2f) {
 				state = STATE_MAIN_MENU;
+				Mix_PlayChannel(-1, gearPickup, 0);
 			}
 		}
 	}
 
 	glClear(GL_COLOR_BUFFER_BIT);
+	glEnable(GL_BLEND);
+
 
 	viewMatrix.identity();
 	modelMatrix.identity();
@@ -1173,7 +1188,7 @@ int main(int argc, char *argv[])
 	//Mix_Music *menuMusic;
 	//menuMusic = Mix_LoadMUS("menuMusic.mp3");
 
-	ParticleEmitter part;
+	ParticleEmitter part; 
 	for (int i = 0; i < 1000; ++i) {
 		Entity e("bullet", false, Vector3(0.1, 0, 0), Vector3(10, 10, 0), Vector3(1, 0, 0));
 		part.particles.push_back(e);
@@ -1346,6 +1361,7 @@ int main(int argc, char *argv[])
 
 			///////DRAWING////////////////////////////////////////////////////////////////////////////////////
 			glClear(GL_COLOR_BUFFER_BIT);
+			glEnable(GL_BLEND);
 
 			minDist = 1000000000;
 			minx = -1;
