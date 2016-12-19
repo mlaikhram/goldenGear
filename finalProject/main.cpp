@@ -122,50 +122,6 @@ class Particle {
 	bool exists;
 };
 
-//class Particle {
-//public:
-//	Vector3 position;
-//	Vector3 velocity;
-//	float lifetime;
-//};
-//
-Vector3 pos(0.0f, 0.0f, 0.0f);
-Vector3 grav(5.0f, 5.0f, 0.0f);
-float lifeTime = 10000.0f;
-
-class ParticleEmitter {
-public:
-	ParticleEmitter(unsigned int particleCount);
-	ParticleEmitter() : position(pos), gravity(grav), maxLifetime(lifeTime) {}
-	//~ParticleEmitter();
-
-	void UpdatePart(float elapsed);
-	void RenderPart(ShaderProgram &program);
-
-	Vector3 position;
-	Vector3 gravity;
-	float maxLifetime;
-
-	std::vector<Entity> particles;
-};
-//
-//void ParticleEmitter::UpdatePart(float elapsed) {
-//	for (Particle p : particles) {
-//		p.position.x += p.velocity.x * 2.0f;
-//	}
-//}
-//
-//void ParticleEmitter::RenderPart(ShaderProgram &program) {
-//	std::vector<float> vertices;
-//	for (int i = 0; i < particles.size(); i++) {
-//		vertices.push_back(particles[i].position.x);
-//		vertices.push_back(particles[i].position.y);
-//	}
-//	glVertexAttribPointer(program.positionAttribute, 2, GL_FLOAT, false, 0, vertices.data());
-//	glEnableVertexAttribArray(program.positionAttribute);
-//	glDrawArrays(GL_POINTS, 0, vertices.size() / 2);
-//}
-
 GLuint LoadTexture(const char *image_path) 
 {
 	SDL_Surface *surface = IMG_Load(image_path);
@@ -634,11 +590,7 @@ float cooldown;
 
 #define FIXED_TIMESTEP 0.0066666f
 #define MAX_TIMESTEPS 12
-void Update(float ticks, float time, ShaderProgram &program, ParticleEmitter &part, float &fixedElapsed) {
-	for (int i = 0; i < part.particles.size(); ++i) { 
-		part.particles[i].position.x = entities[pIndex].position.x + fixedElapsed * part.particles[i].velocity.x;
-		part.particles[i].position.y = entities[pIndex].position.y + fixedElapsed * part.particles[i].velocity.y;
-	}
+void Update(float ticks, float time, ShaderProgram &program) {
 
 	for (unsigned int i = 0; i < entities.size(); ++i) {
 
@@ -1206,12 +1158,6 @@ int main(int argc, char *argv[])
 	//Mix_Music *menuMusic;
 	//menuMusic = Mix_LoadMUS("menuMusic.mp3");
 
-	ParticleEmitter part; 
-	for (int i = 0; i < 1000; ++i) {
-		Entity e("bullet", false, Vector3(0.1, 0, 0), Vector3(10, 10, 0), Vector3(1, 0, 0));
-		part.particles.push_back(e);
-	}
-
 	while (!done) {
 
 		switch (state) {
@@ -1368,9 +1314,9 @@ int main(int argc, char *argv[])
 			}
 			while (fixedElapsed >= FIXED_TIMESTEP) {
 				fixedElapsed -= FIXED_TIMESTEP;
-				Update(ticks, FIXED_TIMESTEP, program, part, fixedElapsed);
+				Update(ticks, FIXED_TIMESTEP, program);
 			}
-			Update(ticks, fixedElapsed, program, part, fixedElapsed);
+			Update(ticks, fixedElapsed, program);
 			units_mx = units_x + entities[pIndex].position.x + TILE_SIZE / 2;
 			units_my = units_y + entities[pIndex].position.y + mapHeight*TILE_SIZE + TILE_SIZE / 2;
 
@@ -1469,19 +1415,6 @@ int main(int argc, char *argv[])
 					program.setViewMatrix(viewMatrix);
 					DrawSpriteSheetSprite(&program, gearCountArr[i], 16, 16, letters);
 				}
-			}
-
-			// Show gear particles
-			if (lifetime > 0) {
-				for (int i = 0; i < part.particles.size(); ++i) {
-					modelMatrix.identity();
-					modelMatrix.Translate(part.particles[i].position.x, part.particles[i].position.y + mapHeight*TILE_SIZE + TILE_SIZE, 0);
-					program.setModelMatrix(modelMatrix);
-					program.setProjectionMatrix(projectionMatrix);
-					program.setViewMatrix(viewMatrix);
-					DrawSpriteSheetSprite(&program, 24, 20, 10, goldenGearSpriteSheet);
-				}
-				lifetime -= 5;
 			}
 
 			SDL_GL_SwapWindow(displayWindow);
