@@ -467,15 +467,20 @@ location=19,27,1,1
 [objectLayer]
 # star
 type=star
-location=18,10,1,1
+location=19,9,1,1
 
 [objectLayer]
 # star
 type=star
-location=65,17,1,1
+location=67,15,1,1
 
 [objectLayer]
 # player
 type=player
 location=2,27,1,1
+
+[objectLayer]
+# crab
+type=crab
+location=11,14,1,1
 

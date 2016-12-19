@@ -109,12 +109,12 @@ public:
 
 class Particle {
 public:
-	Particle(std::string type, bool isGravity, float lifetime, Vector3 position, Vector3 velocity = Vector3(0, 0, 0), Vector3 acceleration = Vector3(0, 0, 0), Vector3 size = Vector3(0, 0, 0), float rotation = 0.0f) :
+	Particle(std::string type, bool isGravity, Vector3 position, Vector3 velocity = Vector3(0, 0, 0), Vector3 acceleration = Vector3(0, 0, 0), Vector3 size = Vector3(0, 0, 0), float rotation = 0.0f) :
 		type(type), isGravity(isGravity), position(position), velocity(velocity), acceleration(acceleration), size(size), rotation(rotation), exists(true) {}
 	//void Draw();
 	std::string type;
 	bool isGravity;
-	float lifetime;
+	//float lifetime;
 	Vector3 position;
 	Vector3 velocity;
 	Vector3 acceleration;
@@ -235,6 +235,7 @@ bool readLayerData(std::ifstream &stream) {
 }
 
 std::vector<Entity> entities;
+int MAX_PARTICLES = 50;
 std::vector<Particle> particles;
 int pIndex;
 
@@ -462,7 +463,7 @@ float distance(double x1, double y1, double x2, double y2) {
 
 void breakWood(int x, int y) {
 	if (!testOutOfBounds(x, y) && levelData[y][x] == 14) {
-		particles.push_back(Particle("wood", true, 10.0f, Vector3( TILE_SIZE * x, -TILE_SIZE * y, 0.0f), Vector3(0.0f, 2.0f, 0.0f), Vector3(0.0f, -5.0f, 0.0f)));
+		particles.push_back(Particle("wood", true, Vector3( TILE_SIZE * x, -TILE_SIZE * y, 0.0f), Vector3(0.0f, 2.0f, 0.0f), Vector3(0.0f, -5.0f, 0.0f)));
 		levelData[y][x] = 18;
 		breakWood(x + 1, y);
 		breakWood(x - 1, y);
@@ -495,12 +496,12 @@ void screenShake(float scale, ShaderProgram &program) {
 
 void kill(Entity &entity) {
 	entity.exists = false;
-	particles.push_back(Particle(entity.type, true, 10.0f, entity.position, Vector3(0.0f, 2.0f, 0.0f), Vector3(0.0f, -5.0f, 0.0f)));
+	particles.push_back(Particle(entity.type, true, entity.position, Vector3(0.0f, 2.0f, 0.0f), Vector3(0.0f, -5.0f, 0.0f)));
 }
 
 void killRadius(Entity &entity, float r) {
 	for (unsigned int i = 0; i < entities.size(); ++i) {
-		if (entities[i].exists && (distance(entity.position.x, entity.position.y, entities[i].position.x, entities[i].position.y) <= r) && (&entity != &entities[i]) &&
+		if (entities[i].exists && (distance(entity.position.x, entity.position.y, entities[i].position.x, entities[i].position.y) <= r * TILE_SIZE) && (&entity != &entities[i]) &&
 			entities[i].type != "gear" && entities[i].type != "silverGear" && entities[i].type != "goldenGear") {
 			kill(entities[i]);
 		}
@@ -526,14 +527,14 @@ void collisiony(Entity &entity, ShaderProgram &program) {
 			screenShake(entity.velocity.y / 100.0f, program);
 		}
 		if (entity.type == "player" && entity.velocity.y <= -7.0f && levelData[gridY][gridX] == 14) {
-			killRadius(entity, 3.0f * TILE_SIZE);
+			killRadius(entity, 4.0f);
 			Mix_PlayChannel(-1, groundBreak, 0);
 			breakWood(gridX, gridY);
 		}
 		else {
 			if (entity.type == "player" && entity.velocity.y <= -7.0f) {
 				Mix_PlayChannel(-1, groundSmash, 0);
-				killRadius(entity, 4.0f * TILE_SIZE);
+				killRadius(entity, 4.0f);
 			}
 			entity.position.y += -1.0f * (entity.position.y) - gridY * TILE_SIZE + 0.001f;
 			entity.velocity.y = 0.0f;
@@ -671,6 +672,11 @@ void Update(float ticks, float time, ShaderProgram &program) {
 			cliffx(entities[i]);
 		}
 	}
+
+	//clean up old particles
+	while (particles.size() > MAX_PARTICLES) {
+		particles.erase(particles.begin());
+	}
 	for (unsigned int i = 0; i < particles.size(); ++i) {
 
 		//gravity
@@ -686,6 +692,7 @@ void Update(float ticks, float time, ShaderProgram &program) {
 
 		particles[i].position.y += particles[i].velocity.y * time;
 		particles[i].position.x += particles[i].velocity.x * time;
+
 	}
 }
 
@@ -1109,14 +1116,11 @@ void level_clear() {
 
 }
 
-int lifetime = 0;
-
 void playerEntityCollision() {
 	for (unsigned int j = 0; j < entities.size(); ++j) {
 		if (entities[j].exists) {
 
 			if (entities[j].type == "gear" && entityCollision(entities[pIndex], entities[j])) {
-				lifetime = 1000;
 				entities[j].exists = false;
 				gearCount++;
 				Mix_PlayChannel(-1, gearPickup, 0);
@@ -1128,7 +1132,7 @@ void playerEntityCollision() {
 				Mix_PlayChannel(-1, gearPickup, 0);
 				break;
 			}
-			else if (entities[j].type == "crab" && entityCollision(entities[pIndex], entities[j])) {
+			else if ((entities[j].type == "crab" || entities[j].type == "star") && entityCollision(entities[pIndex], entities[j])) {
 				if (entities[pIndex].velocity.y <= -7.0f) {
 					kill(entities[j]);
 				}
@@ -1386,6 +1390,12 @@ int main(int argc, char *argv[])
 			if (screenShakeValue > 0.25f) {
 				screenShakeIntensity = 0.0f;
 			}
+			/*for (int i = 0; i < particles.size(); ++i) {
+				particles[i].lifetime -= elapsed / 10000000000000.0f;
+				if (particles[i].lifetime < 0.0f) {
+					particles[i].exists = false;
+				}
+			}*/
 
 			////////ENTITY COLLISION//////////////////////////////////////////////////////////////////////////
 			playerEntityCollision();
@@ -1442,6 +1452,20 @@ int main(int argc, char *argv[])
 					if (entities[i].type == "gear" || entities[i].type == "silverGear" || entities[i].type == "target") {
 						modelMatrix.Rotate(-1 * ticks);
 					}
+					else if (entities[i].type == "star" && distance(entities[pIndex].position.x, entities[pIndex].position.y, entities[i].position.x, entities[i].position.y) <= 8.0f * TILE_SIZE) {
+						float s2px = entities[i].position.x - entities[pIndex].position.x;
+						float s2py = entities[i].position.y - entities[pIndex].position.y;
+						if (s2px > 0.0f) {
+							modelMatrix.Rotate(atan2(s2py, s2px));
+						}
+						else {
+							modelMatrix.Rotate(PI + atan2(s2py, s2px));
+							modelMatrix.Scale(-1.0f, 1, 1);
+						}
+					}
+					else if (entities[i].type == "star") {
+						modelMatrix.Scale(0.05f * sin(ticks * 5.0f * PI) + 1.0f, 0.05f * sin(ticks * 5.0f * PI) + 1.0f, 1.0f);
+					}
 					if (entities[i].type == "crab") {
 						modelMatrix.Scale((sin(ticks * 5.0f * PI))/abs(sin(ticks * 5.0f * PI)), 1, 1);
 					}
@@ -1461,7 +1485,10 @@ int main(int argc, char *argv[])
 
 						viewMatrix.identity();
 						viewMatrix.Translate(-entities[i].position.x, (-1 * (entities[i].position.y + mapHeight*TILE_SIZE))  + sin(screenShakeValue * 100.0f) * screenShakeIntensity, 0);
-					}
+					}/*
+					else if (entities[i].type == "star" && distance(entities[pIndex].position.x, entities[pIndex].position.y, entities[i].position.x, entities[i].position.y) <= 8.0f * TILE_SIZE) {
+						DrawSpriteSheetSprite(&program, 10, 20, 10, goldenGearSpriteSheet); //////////////fix with spritesheet
+					}*/
 					else {
 						int pos = find(types.begin(), types.end(), entities[i].type) - types.begin();
 						DrawSpriteSheetSprite(&program, pos + 24, 20, 10, goldenGearSpriteSheet);
