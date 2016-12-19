@@ -108,6 +108,7 @@ public:
 };
 
 class Particle {
+public:
 	Particle(std::string type, bool isGravity, float lifetime, Vector3 position, Vector3 velocity = Vector3(0, 0, 0), Vector3 acceleration = Vector3(0, 0, 0), Vector3 size = Vector3(0, 0, 0), float rotation = 0.0f) :
 		type(type), isGravity(isGravity), position(position), velocity(velocity), acceleration(acceleration), size(size), rotation(rotation), exists(true) {}
 	//void Draw();
@@ -461,6 +462,7 @@ float distance(double x1, double y1, double x2, double y2) {
 
 void breakWood(int x, int y) {
 	if (!testOutOfBounds(x, y) && levelData[y][x] == 14) {
+		particles.push_back(Particle("wood", true, 10.0f, Vector3( TILE_SIZE * x, -TILE_SIZE * y, 0.0f), Vector3(0.0f, 2.0f, 0.0f), Vector3(0.0f, -5.0f, 0.0f)));
 		levelData[y][x] = 18;
 		breakWood(x + 1, y);
 		breakWood(x - 1, y);
@@ -491,11 +493,16 @@ void screenShake(float scale, ShaderProgram &program) {
 	screenShakeValue = 0.0f;
 }
 
+void kill(Entity &entity) {
+	entity.exists = false;
+	particles.push_back(Particle(entity.type, true, 10.0f, entity.position, Vector3(0.0f, 2.0f, 0.0f), Vector3(0.0f, -5.0f, 0.0f)));
+}
+
 void killRadius(Entity &entity, float r) {
 	for (unsigned int i = 0; i < entities.size(); ++i) {
 		if (entities[i].exists && (distance(entity.position.x, entity.position.y, entities[i].position.x, entities[i].position.y) <= r) && (&entity != &entities[i]) &&
 			entities[i].type != "gear" && entities[i].type != "silverGear" && entities[i].type != "goldenGear") {
-			entities[i].exists = false;
+			kill(entities[i]);
 		}
 	}
 }
@@ -519,7 +526,7 @@ void collisiony(Entity &entity, ShaderProgram &program) {
 			screenShake(entity.velocity.y / 100.0f, program);
 		}
 		if (entity.type == "player" && entity.velocity.y <= -7.0f && levelData[gridY][gridX] == 14) {
-			killRadius(entity, 4.0f * TILE_SIZE);
+			killRadius(entity, 3.0f * TILE_SIZE);
 			Mix_PlayChannel(-1, groundBreak, 0);
 			breakWood(gridX, gridY);
 		}
@@ -594,11 +601,8 @@ void Update(float ticks, float time, ShaderProgram &program) {
 
 	for (unsigned int i = 0; i < entities.size(); ++i) {
 
-		bool prevGrounded = true;
-
 		if (entities[i].type == "player") {
 
-			prevGrounded = entities[i].collidedBottom;
 
 			entities[i].acceleration.x = p1ax;
 			//entities[i].acceleration.y = p1ay;
@@ -623,7 +627,7 @@ void Update(float ticks, float time, ShaderProgram &program) {
 			entities[i].position.y += 0.00025f * sin(ticks * 10.0f / PI);
 		}
 		else if (entities[i].type == "crab") {
-			if (entities[i].cliffDown);			//catches midair crabs so they don't get confused
+			if (entities[i].cliffDown);			//catches midair crabs so they don't get confused and fly away
 			else if (entities[i].collidedLeft || entities[i].cliffLeft) {
 				entities[i].acceleration.x = 0.5f;
 				entities[i].velocity.y = 1.0;
@@ -666,6 +670,22 @@ void Update(float ticks, float time, ShaderProgram &program) {
 			collisionx(entities[i], program);
 			cliffx(entities[i]);
 		}
+	}
+	for (unsigned int i = 0; i < particles.size(); ++i) {
+
+		//gravity
+		/*if (!entities[i].isStatic) {
+			entities[i].acceleration.y = -5.0f;
+		}*/
+
+		particles[i].velocity.x = lerp(particles[i].velocity.x, 0.0f, time * 5);
+		particles[i].velocity.y = lerp(particles[i].velocity.y, 0.0f, time * 1);
+
+		particles[i].velocity.x += particles[i].acceleration.x * time;
+		particles[i].velocity.y += particles[i].acceleration.y * time;
+
+		particles[i].position.y += particles[i].velocity.y * time;
+		particles[i].position.x += particles[i].velocity.x * time;
 	}
 }
 
@@ -1110,7 +1130,7 @@ void playerEntityCollision() {
 			}
 			else if (entities[j].type == "crab" && entityCollision(entities[pIndex], entities[j])) {
 				if (entities[pIndex].velocity.y <= -7.0f) {
-					entities[j].exists = false;
+					kill(entities[j]);
 				}
 				else {
 					state = STATE_GAME_OVER;
@@ -1379,6 +1399,7 @@ int main(int argc, char *argv[])
 			minx = -1;
 			miny = -1;
 
+			//map
 			for (int y = 0; y < mapHeight; ++y) {
 				for (int x = 0; x < mapWidth; ++x) {
 					modelMatrix.identity();
@@ -1400,6 +1421,7 @@ int main(int argc, char *argv[])
 					}
 				}
 			}
+
 			//draw target on nearest magnet
 			if (minx >= 0 && miny >= 0) {
 				modelMatrix.identity();
@@ -1411,6 +1433,7 @@ int main(int argc, char *argv[])
 				DrawSpriteSheetSprite(&program, 27, 20, 10, goldenGearSpriteSheet);
 			}
 			
+			//entities
 			std::vector<std::string> types = {"gear", "silverGear", "goldenGear", "target", "crab", "star", "bullet"};
 			for (unsigned int i = 0; i < entities.size(); ++i) {
 				if (entities[i].exists) {
@@ -1418,6 +1441,9 @@ int main(int argc, char *argv[])
 					modelMatrix.Translate(entities[i].position.x, entities[i].position.y + mapHeight*TILE_SIZE, 0);
 					if (entities[i].type == "gear" || entities[i].type == "silverGear" || entities[i].type == "target") {
 						modelMatrix.Rotate(-1 * ticks);
+					}
+					if (entities[i].type == "crab") {
+						modelMatrix.Scale((sin(ticks * 5.0f * PI))/abs(sin(ticks * 5.0f * PI)), 1, 1);
 					}
 					program.setModelMatrix(modelMatrix);
 					program.setProjectionMatrix(projectionMatrix);
@@ -1441,8 +1467,44 @@ int main(int argc, char *argv[])
 						DrawSpriteSheetSprite(&program, pos + 24, 20, 10, goldenGearSpriteSheet);
 					}
 				}
-			}			
+			}
 
+			//particles
+			for (unsigned int i = 0; i < particles.size(); ++i) {
+				if (!particles[i].exists) {
+					particles.erase(particles.begin() + i);
+					--i;
+				}
+				else {
+					modelMatrix.identity();
+					modelMatrix.Translate(particles[i].position.x, particles[i].position.y + mapHeight*TILE_SIZE, 0);
+					modelMatrix.Rotate(ticks * -5.0f * PI);
+					/*if (entities[i].type == "gear" || entities[i].type == "silverGear" || entities[i].type == "target") {
+						modelMatrix.Rotate(-1 * ticks);
+					}*/
+					if (particles[i].type == "crab") {
+						modelMatrix.Scale((sin(ticks * 5.0f * PI)) / abs(sin(ticks * 5.0f * PI)), 1, 1);
+					}
+					program.setModelMatrix(modelMatrix);
+					program.setProjectionMatrix(projectionMatrix);
+					program.setViewMatrix(viewMatrix);
+					if (particles[i].type == "wood") {
+						DrawSpriteSheetSprite(&program, 31, 20, 10, goldenGearSpriteSheet);
+					}
+					else {
+						int pos = find(types.begin(), types.end(), particles[i].type) - types.begin();
+						DrawSpriteSheetSprite(&program, pos + 24, 20, 10, goldenGearSpriteSheet);
+					}
+				}
+			}
+			for (unsigned int i = 0; i < particles.size(); ++i) {
+				if (!particles[i].exists) {
+					particles.erase(particles.begin() + i);
+					--i;
+				}
+			}
+
+			//HUD
 			gearCountArr[0] = NUM_SHIFT + gearCount / 100;
 			gearCountArr[1] = NUM_SHIFT + gearCount / 10 % 10;
 			gearCountArr[2] = NUM_SHIFT + gearCount % 10;

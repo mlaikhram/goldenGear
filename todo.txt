@@ -4,7 +4,7 @@ NONE!?
 Sprites/Visual:
 Add character and enemy animations
 //Add HUD with gear count, level, and health
-Add particle effects on active magnets and breaking wooden floors
+Add particle effects on active magnets
 
 Audio:
 //Add background music
@@ -17,7 +17,7 @@ Add star functionality
 
 General:
 //Add level select menu
-Add death scenes
+//Add death scenes
 Add more levels
 Add boss fight
 Save current gear count and only spawn in gears that have not been collected
