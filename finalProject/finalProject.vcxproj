@@ -93,6 +93,7 @@
     <Image Include="game_over.png" />
     <Image Include="golden_gear_spritesheet.png" />
     <Image Include="letters.png" />
+    <Image Include="menu.png" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="test.txt" />

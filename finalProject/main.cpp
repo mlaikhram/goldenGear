@@ -620,7 +620,7 @@ void Update(float ticks, float time, ShaderProgram &program) {
 			}
 		}
 		else if (entities[i].type == "gear" || entities[i].type == "silverGear") {
-			entities[i].position.y += 0.001f * sin(ticks * 10.0f / PI);
+			entities[i].position.y += 0.00025f * sin(ticks * 10.0f / PI);
 		}
 		else if (entities[i].type == "crab") {
 			if (entities[i].cliffDown);			//catches midair crabs so they don't get confused
@@ -675,7 +675,7 @@ int LETTER_SHIFT = 65;
 SDL_Event event;
 bool done = false;
 
-void main_menu(ShaderProgram &program, GLuint &letters) {
+void main_menu(ShaderProgram &program, GLuint &letters, GLuint &menuPage) {
 
 	int playGameArr[] = { P, L, A, Y, -1, G, A, M, E };
 	int controlsArr[] = { C, O, N, T, R, O, L, S };
@@ -714,6 +714,30 @@ void main_menu(ShaderProgram &program, GLuint &letters) {
 	}
 	glClear(GL_COLOR_BUFFER_BIT);
 	glEnable(GL_BLEND);
+
+	viewMatrix.identity();
+	modelMatrix.identity();
+	// Draw background image
+	program.setModelMatrix(modelMatrix);
+	program.setProjectionMatrix(projectionMatrix);
+	program.setViewMatrix(viewMatrix);
+
+	//GLuint gameOverPage = LoadTexture("menu.png");
+
+	glBindTexture(GL_TEXTURE_2D, menuPage);
+
+	float vertices[] = { -3.55f, -2.0f, 3.55f, -2.0f, 3.55f, 2.0f, -3.55f, -2.0f, 3.55f, 2.0f, -3.55f, 2.0f };
+	glVertexAttribPointer(program.positionAttribute, 2, GL_FLOAT, false, 0, vertices);
+	glEnableVertexAttribArray(program.positionAttribute);
+
+	float texCoords[] = { 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0 };
+	glVertexAttribPointer(program.texCoordAttribute, 2, GL_FLOAT, false, 0, texCoords);
+	glEnableVertexAttribArray(program.texCoordAttribute);
+
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+
+	glDisableVertexAttribArray(program.positionAttribute);
+	glDisableVertexAttribArray(program.texCoordAttribute);
 
 	for (int i = 0; i < 9; ++i) { // Length of playGameArr
 		if (playGameArr[i] != -1) {
@@ -815,7 +839,7 @@ void new_game(ShaderProgram &program, const std::string &level) {
 
 std::string level;
 
-void level_select(ShaderProgram &program, GLuint &letters) {
+void level_select(ShaderProgram &program, GLuint &letters, GLuint &menuPage) {
 	int stageOneArr[] = { S, T, A, G, E, -1, O, N, E };
 	int stageTwoArr[] = { S, T, A, G, E, -1, T, W, O };
 	int stageThreeArr[] = { S, T, A, G, E, -1, T, H, R, E, E };
@@ -869,6 +893,23 @@ void level_select(ShaderProgram &program, GLuint &letters) {
 	program.setModelMatrix(modelMatrix);
 	program.setProjectionMatrix(projectionMatrix);
 	program.setViewMatrix(viewMatrix);
+
+	//GLuint gameOverPage = LoadTexture("menu.png");
+
+	glBindTexture(GL_TEXTURE_2D, menuPage);
+
+	float vertices[] = { -3.55f, -2.0f, 3.55f, -2.0f, 3.55f, 2.0f, -3.55f, -2.0f, 3.55f, 2.0f, -3.55f, 2.0f };
+	glVertexAttribPointer(program.positionAttribute, 2, GL_FLOAT, false, 0, vertices);
+	glEnableVertexAttribArray(program.positionAttribute);
+
+	float texCoords[] = { 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0 };
+	glVertexAttribPointer(program.texCoordAttribute, 2, GL_FLOAT, false, 0, texCoords);
+	glEnableVertexAttribArray(program.texCoordAttribute);
+
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+
+	glDisableVertexAttribArray(program.positionAttribute);
+	glDisableVertexAttribArray(program.texCoordAttribute);
 
 	for (int i = 0; i < 9; ++i) { // Length of stageOneArr
 		if (stageOneArr[i] != -1) {
@@ -1096,6 +1137,7 @@ int main(int argc, char *argv[])
 	glViewport(0, 0, 1280, 720);
 	ShaderProgram program(RESOURCE_FOLDER"vertex_textured.glsl", RESOURCE_FOLDER"fragment_textured.glsl");
 	
+	GLuint menuPage = LoadTexture("menu.png");
 	GLuint controlsPage = LoadTexture("controls.png");
 	GLuint gameOverPage = LoadTexture("game_over.png");
 	GLuint letters = LoadTexture("letters.png");
@@ -1163,11 +1205,11 @@ int main(int argc, char *argv[])
 		switch (state) {
 
 		case STATE_MAIN_MENU:
-			main_menu(program, letters);
+			main_menu(program, letters, menuPage);
 			break;
 
 		case STATE_LEVEL_SELECT:
-			level_select(program, letters);
+			level_select(program, letters, menuPage);
 			break;
 
 		case STATE_CONTROLS:
