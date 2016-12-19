@@ -114,25 +114,25 @@ public:
 //	float lifetime;
 //};
 //
-//Vector3 pos(0.0f, 0.0f, 0.0f);
-//Vector3 grav(5.0f, 5.0f, 0.0f);
-//float lifeTime = 10000.0f;
-//
-//class ParticleEmitter {
-//public:
-//	ParticleEmitter(unsigned int particleCount);
-//	ParticleEmitter() : position(pos), gravity(grav), maxLifetime(lifeTime) {}
-//	//~ParticleEmitter();
-//
-//	void UpdatePart(float elapsed);
-//	void RenderPart(ShaderProgram &program);
-//
-//	Vector3 position;
-//	Vector3 gravity;
-//	float maxLifetime;
-//
-//	std::vector<Particle> particles;
-//};
+Vector3 pos(0.0f, 0.0f, 0.0f);
+Vector3 grav(5.0f, 5.0f, 0.0f);
+float lifeTime = 10000.0f;
+
+class ParticleEmitter {
+public:
+	ParticleEmitter(unsigned int particleCount);
+	ParticleEmitter() : position(pos), gravity(grav), maxLifetime(lifeTime) {}
+	//~ParticleEmitter();
+
+	void UpdatePart(float elapsed);
+	void RenderPart(ShaderProgram &program);
+
+	Vector3 position;
+	Vector3 gravity;
+	float maxLifetime;
+
+	std::vector<Entity> particles;
+};
 //
 //void ParticleEmitter::UpdatePart(float elapsed) {
 //	for (Particle p : particles) {
@@ -563,7 +563,12 @@ float cooldown;
 
 #define FIXED_TIMESTEP 0.0166666f
 #define MAX_TIMESTEPS 6
-void Update(float ticks, float time, ShaderProgram &program) {
+void Update(float ticks, float time, ShaderProgram &program, ParticleEmitter &part, float &fixedElapsed) {
+	for (int i = 0; i < part.particles.size(); ++i) {
+		part.particles[i].position.x = entities[pIndex].position.x + fixedElapsed * part.particles[i].velocity.x;
+		part.particles[i].position.y = entities[pIndex].position.y + fixedElapsed * part.particles[i].velocity.y;
+	}
+
 	for (unsigned int i = 0; i < entities.size(); ++i) {
 
 		bool prevGrounded = true;
@@ -1005,11 +1010,14 @@ void level_clear() {
 
 }
 
+int lifetime = 0;
+
 void playerEntityCollision() {
 	for (unsigned int j = 0; j < entities.size(); ++j) {
 		if (entities[j].exists) {
 
 			if (entities[j].type == "gear" && entityCollision(entities[pIndex], entities[j])) {
+				lifetime = 1000;
 				entities[j].exists = false;
 				gearCount++;
 				Mix_PlayChannel(-1, gearPickup, 0);
@@ -1110,17 +1118,11 @@ int main(int argc, char *argv[])
 	//Mix_Music *menuMusic;
 	//menuMusic = Mix_LoadMUS("menuMusic.mp3");
 
-	//ParticleEmitter p;
-	//for (int i = 0; i < 1000; ++i) {
-	//	Particle part;
-	//	part.position = pos;
-	//	part.velocity = grav;
-	//	part.lifetime = lifeTime;
-	//	p.particles.push_back(part);
-	//	//pos.x += 0.002f;
-	//}
-	//p.UpdatePart(100.0f);
-	//p.RenderPart(program);
+	ParticleEmitter part;
+	for (int i = 0; i < 1000; ++i) {
+		Entity e("bullet", false, Vector3(0.1, 0, 0), Vector3(10, 10, 0), Vector3(1, 0, 0));
+		part.particles.push_back(e);
+	}
 
 	while (!done) {
 
@@ -1272,9 +1274,9 @@ int main(int argc, char *argv[])
 			}
 			while (fixedElapsed >= FIXED_TIMESTEP) {
 				fixedElapsed -= FIXED_TIMESTEP;
-				Update(ticks, FIXED_TIMESTEP, program);
+				Update(ticks, FIXED_TIMESTEP, program, part, fixedElapsed);
 			}
-			Update(ticks, fixedElapsed, program);
+			Update(ticks, fixedElapsed, program, part, fixedElapsed);
 			units_mx = units_x + entities[pIndex].position.x + TILE_SIZE / 2;
 			units_my = units_y + entities[pIndex].position.y + mapHeight*TILE_SIZE + TILE_SIZE / 2;
 
@@ -1372,6 +1374,19 @@ int main(int argc, char *argv[])
 					program.setViewMatrix(viewMatrix);
 					DrawSpriteSheetSprite(&program, gearCountArr[i], 16, 16, letters);
 				}
+			}
+
+			// Show gear particles
+			if (lifetime > 0) {
+				for (int i = 0; i < part.particles.size(); ++i) {
+					modelMatrix.identity();
+					modelMatrix.Translate(part.particles[i].position.x, part.particles[i].position.y + mapHeight*TILE_SIZE + TILE_SIZE, 0);
+					program.setModelMatrix(modelMatrix);
+					program.setProjectionMatrix(projectionMatrix);
+					program.setViewMatrix(viewMatrix);
+					DrawSpriteSheetSprite(&program, 24, 20, 10, goldenGearSpriteSheet);
+				}
+				lifetime -= 5;
 			}
 
 			SDL_GL_SwapWindow(displayWindow);
