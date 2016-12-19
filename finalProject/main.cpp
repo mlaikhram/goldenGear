@@ -107,6 +107,21 @@ public:
 	//SheetSprite sprite;
 };
 
+class Particle {
+	Particle(std::string type, bool isGravity, float lifetime, Vector3 position, Vector3 velocity = Vector3(0, 0, 0), Vector3 acceleration = Vector3(0, 0, 0), Vector3 size = Vector3(0, 0, 0), float rotation = 0.0f) :
+		type(type), isGravity(isGravity), position(position), velocity(velocity), acceleration(acceleration), size(size), rotation(rotation), exists(true) {}
+	//void Draw();
+	std::string type;
+	bool isGravity;
+	float lifetime;
+	Vector3 position;
+	Vector3 velocity;
+	Vector3 acceleration;
+	Vector3 size;
+	float rotation;
+	bool exists;
+};
+
 //class Particle {
 //public:
 //	Vector3 position;
@@ -263,6 +278,7 @@ bool readLayerData(std::ifstream &stream) {
 }
 
 std::vector<Entity> entities;
+std::vector<Particle> particles;
 int pIndex;
 
 void placeEntity(std::string type, float x, float y) {
@@ -1160,6 +1176,8 @@ int main(int argc, char *argv[])
 	//int gearCount = 0; // ----------------------------------------
 	int gearCountArr[] = { NUM_SHIFT, NUM_SHIFT, NUM_SHIFT };
 
+	float bobbing = 0.0f;
+
 	//// Loading sound and music
 	Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 4096);
 	magnetRepel = Mix_LoadWAV("magnetRepel.wav");
@@ -1219,6 +1237,7 @@ int main(int argc, char *argv[])
 			/////////////INPUT////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 			p1ax = 0.0f;
 			p1ay = -5.0f;
+			bobbing = 0.0f;
 
 			int p1x, p1y;
 			worldToTileCoordinates(entities[pIndex].position.x + TILE_SIZE / 2, entities[pIndex].position.y + TILE_SIZE / 2, &p1x, &p1y);
@@ -1266,15 +1285,20 @@ int main(int argc, char *argv[])
 			}
 			const Uint8 *keys = SDL_GetKeyboardState(NULL);
 			if (keys[SDL_SCANCODE_LEFT] || keys[SDL_SCANCODE_A] || keys[SDL_SCANCODE_K]) {
+				bobbing = 0.01f;
 				p1ax += -5.0f;
 			}
 			if (keys[SDL_SCANCODE_RIGHT] || keys[SDL_SCANCODE_D] || keys[SDL_SCANCODE_SEMICOLON]) {
+				bobbing = 0.01f;
 				p1ax += 5.0f;
 			}
 
 			while (SDL_PollEvent(&event)) {
-				if (event.type == SDL_QUIT || event.type == SDL_WINDOWEVENT_CLOSE || event.key.keysym.scancode == SDL_SCANCODE_ESCAPE) {
+				if (event.type == SDL_QUIT || event.type == SDL_WINDOWEVENT_CLOSE) {
 					done = true;
+				}
+				else if (event.key.keysym.scancode == SDL_SCANCODE_ESCAPE) {
+					state = STATE_GAME_OVER;
 				}
 				else if (event.type == SDL_KEYDOWN) {
 					if (event.key.keysym.scancode == SDL_SCANCODE_SPACE) {
@@ -1414,7 +1438,7 @@ int main(int argc, char *argv[])
 						DrawSpriteSheetSprite(&program, 60, 20, 10, goldenGearSpriteSheet);
 
 						modelMatrix.identity();
-						modelMatrix.Translate(entities[i].position.x, entities[i].position.y + mapHeight*TILE_SIZE + TILE_SIZE, 0);
+						modelMatrix.Translate(entities[i].position.x, entities[i].position.y + mapHeight*TILE_SIZE + TILE_SIZE + bobbing * sin(ticks * 100.0f * PI) - 0.01f, 0);
 
 						program.setModelMatrix(modelMatrix);
 						program.setProjectionMatrix(projectionMatrix);
