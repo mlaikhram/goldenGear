@@ -1,3 +1,4 @@
 ﻿  main.cpp
-c:\users\matthew\desktop\gitstuff\mkl\cs3113\finalproject\finalproject\main.cpp(679): warning C4018: '>' : signed/unsigned mismatch
+c:\users\matthew\desktop\gitstuff\mkl\cs3113\finalproject\finalproject\main.cpp(677): warning C4018: '>' : signed/unsigned mismatch
+c:\users\matthew\desktop\gitstuff\mkl\cs3113\finalproject\finalproject\main.cpp(1502): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
   finalProject.vcxproj -> C:\Users\Matthew\Desktop\gitStuff\mkl\CS3113\finalProject\Debug\finalProject.exe

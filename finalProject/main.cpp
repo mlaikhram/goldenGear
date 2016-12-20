@@ -891,14 +891,14 @@ void level_select(ShaderProgram &program, GLuint &letters, GLuint &menuPage) {
 			}
 
 			else if (units_x > -2.1f && units_x < -0.4f && units_y > -0.6f && units_y < -0.4f) {
-				level = "test.txt";
+				level = "world2.txt";
 				new_game(program, level);
 				state = STATE_GAME_LEVEL;
 				Mix_PlayChannel(-1, gearPickup, 0);
 			}
 
 			else if (units_x > -2.1f && units_x < 0.0f && units_y > -1.1f && units_y < -0.9f) {
-				level = "world1.txt";
+				level = "test.txt";
 				new_game(program, level);
 				state = STATE_GAME_LEVEL;
 				Mix_PlayChannel(-1, gearPickup, 0);
@@ -1133,7 +1133,7 @@ void playerEntityCollision() {
 				Mix_PlayChannel(-1, gearPickup, 0);
 				break;
 			}
-			else if ((entities[j].type == "crab" || entities[j].type == "star") && entityCollision(entities[pIndex], entities[j])) {
+			else if ((entities[j].type == "crab" || entities[j].type == "star" || entities[j].type == "hedgehog") && entityCollision(entities[pIndex], entities[j])) {
 				if (entities[pIndex].velocity.y <= -7.0f) {
 					kill(entities[j]);
 				}
@@ -1445,7 +1445,7 @@ int main(int argc, char *argv[])
 			}
 			
 			//entities
-			std::vector<std::string> types = {"gear", "silverGear", "goldenGear", "target", "crab", "star", "bullet"};
+			std::vector<std::string> types = {"gear", "silverGear", "goldenGear", "target", "crab", "star", "hedgehog"};
 			for (unsigned int i = 0; i < entities.size(); ++i) {
 				if (entities[i].exists) {
 					modelMatrix.identity();
@@ -1496,7 +1496,10 @@ int main(int argc, char *argv[])
 						viewMatrix.Translate(-entities[i].position.x, (-1 * (entities[i].position.y + mapHeight*TILE_SIZE))  + sin(screenShakeValue * 100.0f) * screenShakeIntensity, 0);
 					}
 					else if (entities[i].type == "star" && distance(entities[pIndex].position.x, entities[pIndex].position.y, entities[i].position.x, entities[i].position.y) <= 8.0f * TILE_SIZE) {
-						DrawSpriteSheetSprite(&program, 32, 20, 10, goldenGearSpriteSheet); //////////////fix with spritesheet
+						DrawSpriteSheetSprite(&program, 32, 20, 10, goldenGearSpriteSheet);
+					}
+					else if (entities[i].type == "hedgehog") {
+						DrawSpriteSheetSprite(&program, 30 + 1.5 * ((sin(ticks * 2.5f * PI)) / abs(sin(ticks * 2.5f * PI)) + 1), 20, 10, goldenGearSpriteSheet);
 					}
 					else {
 						int pos = find(types.begin(), types.end(), entities[i].type) - types.begin();
