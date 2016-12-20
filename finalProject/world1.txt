@@ -217,12 +217,12 @@ location=57,29,1,1
 [objectLayer]
 # gear
 type=gear
-location=59,23,1,1
+location=59,22,1,1
 
 [objectLayer]
 # gear
 type=gear
-location=61,23,1,1
+location=62,22,1,1
 
 [objectLayer]
 # gear

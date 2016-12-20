@@ -597,7 +597,7 @@ float p1jump;
 float cooldown;
 
 #define FIXED_TIMESTEP 0.0066666f
-#define MAX_TIMESTEPS 12
+#define MAX_TIMESTEPS 8
 void Update(float ticks, float time, ShaderProgram &program) {
 
 	for (unsigned int i = 0; i < entities.size(); ++i) {
