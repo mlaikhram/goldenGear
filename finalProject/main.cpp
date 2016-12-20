@@ -1088,6 +1088,7 @@ int NUM_SHIFT = 48;
 void level_clear() {
 	//empty the level
 	entities.clear();
+	particles.clear();
 	for (int i = 0; i < mapHeight; ++i) {
 		delete[] levelData[i];
 	}
@@ -1466,14 +1467,22 @@ int main(int argc, char *argv[])
 					else if (entities[i].type == "star") {
 						modelMatrix.Scale(0.05f * sin(ticks * 5.0f * PI) + 1.0f, 0.05f * sin(ticks * 5.0f * PI) + 1.0f, 1.0f);
 					}
-					if (entities[i].type == "crab") {
+					else if (entities[i].type == "crab") {
 						modelMatrix.Scale((sin(ticks * 5.0f * PI))/abs(sin(ticks * 5.0f * PI)), 1, 1);
+					}
+					else if (entities[i].type == "player" && entities[i].velocity.y <= -7.0f) {
+						modelMatrix.Scale((sin(ticks * 10.0f * PI)) / abs(sin(ticks * 10.0f * PI)), 1, 1);
 					}
 					program.setModelMatrix(modelMatrix);
 					program.setProjectionMatrix(projectionMatrix);
 					program.setViewMatrix(viewMatrix);
 					if (entities[i].type == "player") {
-						DrawSpriteSheetSprite(&program, 60, 20, 10, goldenGearSpriteSheet);
+						if (entities[i].velocity.y <= -7.0f) {
+							DrawSpriteSheetSprite(&program, 61, 20, 10, goldenGearSpriteSheet);
+						}
+						else {
+							DrawSpriteSheetSprite(&program, 60, 20, 10, goldenGearSpriteSheet);
+						}
 
 						modelMatrix.identity();
 						modelMatrix.Translate(entities[i].position.x, entities[i].position.y + mapHeight*TILE_SIZE + TILE_SIZE + bobbing * sin(ticks * 10.0f * PI) - 0.01f, 0);
@@ -1485,10 +1494,10 @@ int main(int argc, char *argv[])
 
 						viewMatrix.identity();
 						viewMatrix.Translate(-entities[i].position.x, (-1 * (entities[i].position.y + mapHeight*TILE_SIZE))  + sin(screenShakeValue * 100.0f) * screenShakeIntensity, 0);
-					}/*
+					}
 					else if (entities[i].type == "star" && distance(entities[pIndex].position.x, entities[pIndex].position.y, entities[i].position.x, entities[i].position.y) <= 8.0f * TILE_SIZE) {
-						DrawSpriteSheetSprite(&program, 10, 20, 10, goldenGearSpriteSheet); //////////////fix with spritesheet
-					}*/
+						DrawSpriteSheetSprite(&program, 32, 20, 10, goldenGearSpriteSheet); //////////////fix with spritesheet
+					}
 					else {
 						int pos = find(types.begin(), types.end(), entities[i].type) - types.begin();
 						DrawSpriteSheetSprite(&program, pos + 24, 20, 10, goldenGearSpriteSheet);
