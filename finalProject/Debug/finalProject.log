@@ -1,4 +1,9 @@
-﻿  main.cpp
-c:\users\matthew\desktop\gitstuff\mkl\cs3113\finalproject\finalproject\main.cpp(677): warning C4018: '>' : signed/unsigned mismatch
-c:\users\matthew\desktop\gitstuff\mkl\cs3113\finalproject\finalproject\main.cpp(1502): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-  finalProject.vcxproj -> C:\Users\Matthew\Desktop\gitStuff\mkl\CS3113\finalProject\Debug\finalProject.exe
+﻿Build started 12/20/2016 6:05:25 PM.
+     1>Project "E:\MATT\3\CS3113\finalProject\finalProject\finalProject.vcxproj" on node 2 (Build target(s)).
+     1>Link:
+         finalProject.vcxproj -> E:\MATT\3\CS3113\finalProject\Debug\finalProject.exe
+     1>Done Building Project "E:\MATT\3\CS3113\finalProject\finalProject\finalProject.vcxproj" (Build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:00.03

@@ -898,7 +898,7 @@ void level_select(ShaderProgram &program, GLuint &letters, GLuint &menuPage) {
 			}
 
 			else if (units_x > -2.1f && units_x < 0.0f && units_y > -1.1f && units_y < -0.9f) {
-				level = "test.txt";
+				level = "world3.txt";
 				new_game(program, level);
 				state = STATE_GAME_LEVEL;
 				Mix_PlayChannel(-1, gearPickup, 0);

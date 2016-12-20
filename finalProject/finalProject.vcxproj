@@ -98,6 +98,7 @@
   <ItemGroup>
     <Text Include="test.txt" />
     <Text Include="world1.txt" />
+    <Text Include="world3.txt" />
   </ItemGroup>
   <ItemGroup>
     <Media Include="gameMusic.mp3" />
