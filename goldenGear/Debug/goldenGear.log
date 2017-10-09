@@ -1,0 +1,10 @@
+﻿  ShaderProgram.cpp
+  Matrix.cpp
+c:\users\matthew\desktop\cs3113\goldengear\matrix.cpp(213): warning C4244: 'argument' : conversion from 'double' to 'float', possible loss of data
+c:\users\matthew\desktop\cs3113\goldengear\matrix.cpp(214): warning C4244: 'argument' : conversion from 'double' to 'float', possible loss of data
+  main.cpp
+c:\users\matthew\desktop\cs3113\goldengear\main.cpp(677): warning C4018: '>' : signed/unsigned mismatch
+c:\users\matthew\desktop\cs3113\goldengear\main.cpp(1502): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
+  Generating Code...
+MSVCRTD.lib(cinitexe.obj) : warning LNK4098: defaultlib 'msvcrt.lib' conflicts with use of other libs; use /NODEFAULTLIB:library
+  goldenGear.vcxproj -> C:\Users\Matthew\Desktop\CS3113\Debug\goldenGear.exe
