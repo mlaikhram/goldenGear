@@ -526,13 +526,13 @@ void collisiony(Entity &entity, ShaderProgram &program) {
 			Mix_PlayChannel(-1, landing, 0);
 			screenShake(entity.velocity.y / 100.0f, program);
 		}
-		if (entity.type == "player" && entity.velocity.y <= -7.0f && levelData[gridY][gridX] == 14) {
+		if (entity.type == "player" && entity.velocity.y <= -6.0f && levelData[gridY][gridX] == 14) {
 			killRadius(entity, 4.0f);
 			Mix_PlayChannel(-1, groundBreak, 0);
 			breakWood(gridX, gridY);
 		}
 		else {
-			if (entity.type == "player" && entity.velocity.y <= -7.0f) {
+			if (entity.type == "player" && entity.velocity.y <= -6.0f) {
 				Mix_PlayChannel(-1, groundSmash, 0);
 				killRadius(entity, 4.0f);
 			}
@@ -1134,7 +1134,7 @@ void playerEntityCollision() {
 				break;
 			}
 			else if ((entities[j].type == "crab" || entities[j].type == "star" || entities[j].type == "hedgehog") && entityCollision(entities[pIndex], entities[j])) {
-				if (entities[pIndex].velocity.y <= -7.0f) {
+				if (entities[pIndex].velocity.y <= -6.0f) {
 					kill(entities[j]);
 				}
 				else {
@@ -1470,14 +1470,14 @@ int main(int argc, char *argv[])
 					else if (entities[i].type == "crab") {
 						modelMatrix.Scale((sin(ticks * 5.0f * PI))/abs(sin(ticks * 5.0f * PI)), 1, 1);
 					}
-					else if (entities[i].type == "player" && entities[i].velocity.y <= -7.0f) {
+					else if (entities[i].type == "player" && entities[i].velocity.y <= -6.0f) {
 						modelMatrix.Scale((sin(ticks * 10.0f * PI)) / abs(sin(ticks * 10.0f * PI)), 1, 1);
 					}
 					program.setModelMatrix(modelMatrix);
 					program.setProjectionMatrix(projectionMatrix);
 					program.setViewMatrix(viewMatrix);
 					if (entities[i].type == "player") {
-						if (entities[i].velocity.y <= -7.0f) {
+						if (entities[i].velocity.y <= -6.0f) {
 							DrawSpriteSheetSprite(&program, 61, 20, 10, goldenGearSpriteSheet);
 						}
 						else {
